@@ -53,10 +53,6 @@
         return [h, s, l];
     }
 
-    function rgbToString(rgb) {
-        return "rgb(" + rgb[0] + ", " + rgb[1] + ", " + rgb[2] + ")";
-    }
-
     function createCanvas() {
         return document.createElement('canvas');
     }
@@ -64,6 +60,7 @@
     function Pixify(canvas, image) {
         var _canvas = canvas;
         var _ctx = _canvas.getContext('2d');
+        var _imageData = _ctx.createImageData(_canvas.width, _canvas.height);
 
         var _spriteCanvas = createCanvas();
         var _spriteCtx = _spriteCanvas.getContext('2d');
@@ -74,68 +71,69 @@
         _spriteCanvas.height = yRes;
         _spriteCtx.drawImage(image, 0, 0, xRes, yRes);
 
-
-        var _pixelWidth = 53;
-
-        // _canvas.width = xRes * _pixelWidth + (xRes - 1) * horgap;
-        console.log((_canvas.width - xRes * _pixelWidth) / (xRes - 1));
-        // _pixelWidth = (_canvas.width - 10 * (xRes - 1)) / xRes
-
-        // var _pixelWidth = 53;
-        var _pixelHalfWidth = (_pixelWidth - 3) / 2 + 2
+        var _pixelHalfWidth = 46;
+        var _pixelWidth = _pixelHalfWidth * 2 - 1;
         var _pixelHeight = 50;
         var _gap = 0;
+        var _offset = _pixelHalfWidth / 2 - 1;
 
-        var offset = _pixelHalfWidth / 2;
+        var _distance = _pixelHalfWidth + _gap;
 
-        var _topLeft = {
-            _x: 0,
-            _y: offset
-        };
-        var _topTop = {
-            _x: _pixelHalfWidth,
-            _y: 0
-        };
-        var _topRight = {
-            _x: _pixelWidth,
-            _y: offset
-        };
-        var _topBottom = {
-            _x: _pixelHalfWidth,
-            _y: offset * 2
-        };
-        var _bottomLeft = {
-            _x: 0,
-            _y: offset + _pixelHeight
-        };
-        var _bottomBottom = {
-            _x: _pixelHalfWidth,
-            _y: offset * 2 + _pixelHeight
-        };
-        var _bottomRight = {
-            _x: _pixelWidth,
-            _y: offset + _pixelHeight
-        };
-
-        var _distance = 45;//(_pixelHalfWidth) + _gap;
-
-        // for (var i = 0; i < _spriteCanvas.width; i++) {
         for (var j = 0; j < _spriteCanvas.height; j++) {
             for (var i = _spriteCanvas.width; i >= 0; i--) {
-                //     for (var j = _spriteCanvas.height; j >= 0; j--) {
                 var data = _spriteCtx.getImageData(i, j, 1, 1).data;
-                pixel2pixel((i + j) * _distance, 300 + (j * 0.5  - i * 0.5) * _distance, [data[0], data[1], data[2]]);
+                pixel2pixel((i + j) * _distance, 300 + (j * 0.5 - i * 0.5) * _distance, [data[0], data[1], data[2]]);
+            }
+        }
+
+        _ctx.putImageData(_imageData, 0, 0);
+
+        function setPixel(x, y, color) {
+            if (x >= 0 && x < _canvas.width && y >= 0 && y < _canvas.height) {
+                var index = (x + y * _imageData.width) * 4;
+                _imageData.data[index + 0] = color[0];
+                _imageData.data[index + 1] = color[1];
+                _imageData.data[index + 2] = color[2];
+                _imageData.data[index + 3] = 255;
+            }
+        }
+
+        function drawSlantedLineUp(x, y, distance, color) {
+            var start = x;
+            while (x < start + distance) {
+                setPixel(x, y, color);
+                setPixel(x + 1, y, color);
+                y--;
+                x += 2;
+            }
+        }
+
+        function drawSlantedLineDown(x, y, distance, color) {
+            var start = x;
+            while (x < start + distance) {
+                setPixel(x, y, color);
+                setPixel(x + 1, y, color);
+                y++;
+                x += 2;
+            }
+        }
+
+        function drawVerticalLine(x, y, distance, color) {
+            var start = y;
+            while (y < start + distance) {
+                setPixel(x, y, color);
+                y++;
             }
         }
 
         function getColorPalette(color) {
             var hslColor = rgbToHsl(color[0], color[1], color[2]);
             return {
-                top: rgbToString(color),
-                left: rgbToString(hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.7)),
-                right: rgbToString(hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.4)),
-                highlight: rgbToString(hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 1.8)),
-                outline: rgbToString(hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.1))
+                top: color,
+                left: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.7),
+                right: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.4),
+                highlight: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 1.8),
+                outline: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.1)
             }
         }
 
@@ -146,60 +144,30 @@
 
             var palette = getColorPalette(color);
 
+            for (var i = 1; i < _pixelHeight; i++) {
+                drawSlantedLineDown(x, y + _offset + i, _pixelHalfWidth, palette.left);
+            }
 
+            for (var i = 1; i < _pixelHeight; i++) {
+                drawSlantedLineUp(x + _pixelHalfWidth - 1, y + _offset * 2 + i, _pixelHalfWidth, palette.right);
+            }
 
-            // Top face
-            _ctx.fillStyle = palette.top;
-            _ctx.beginPath();
-            _ctx.moveTo(x + _topLeft._x, y + _topLeft._y);
-            _ctx.lineTo(x + _topTop._x, y + _topTop._y);
-            _ctx.lineTo(x + _topRight._x, y + _topRight._y);
-            _ctx.lineTo(x + _topBottom._x, y + _topBottom._y);
-            _ctx.closePath();
-            _ctx.fill();
+            for (var i = 1; i < _pixelHalfWidth - 1; i++) {
+                drawSlantedLineUp(x + i * 2, y + _offset, _pixelHalfWidth - i - 1, palette.top);
+                drawSlantedLineDown(x + i * 2, y + _offset, _pixelHalfWidth - i - 1, palette.top);
+            }
 
-            // Left face
-            _ctx.fillStyle = palette.left;
-            _ctx.beginPath();
-            _ctx.moveTo(x + _topLeft._x, y + _topLeft._y);
-            _ctx.lineTo(x + _topBottom._x, y + _topBottom._y);
-            _ctx.lineTo(x + _bottomBottom._x, y + _bottomBottom._y);
-            _ctx.lineTo(x + _bottomLeft._x, y + _bottomLeft._y);
-            _ctx.closePath();
-            _ctx.fill();
+            drawSlantedLineUp(x, y + _offset, _pixelHalfWidth, palette.outline);
+            drawSlantedLineDown(x + _pixelHalfWidth - 1, y, _pixelHalfWidth, palette.outline);
+            drawSlantedLineDown(x + 2, y + _offset + 1, _pixelHalfWidth - 2, palette.highlight);
+            drawSlantedLineUp(x + _pixelHalfWidth - 1, y + 2 * _offset, _pixelHalfWidth - 2, palette.highlight);
 
-            // Right face
-            _ctx.fillStyle = palette.right;
-            _ctx.beginPath();
-            _ctx.moveTo(x + _topBottom._x, y + _topBottom._y);
-            _ctx.lineTo(x + _topRight._x, y + _topRight._y);
-            _ctx.lineTo(x + _bottomRight._x, y + _bottomRight._y);
-            _ctx.lineTo(x + _bottomBottom._x, y + _bottomBottom._y);
+            drawVerticalLine(x, y + _offset, _pixelHeight, palette.outline);
+            drawVerticalLine(x + _pixelHalfWidth - 1, y + 2 * _offset, _pixelHeight, palette.highlight);
+            drawVerticalLine(x + _pixelWidth - 1, y + _offset, _pixelHeight, palette.outline);
 
-            _ctx.closePath();
-            _ctx.fill();
-
-            // Outer line
-            _ctx.strokeStyle = palette.outline;
-            _ctx.beginPath();
-            _ctx.moveTo(x + _topLeft._x, y + _topLeft._y);
-            _ctx.lineTo(x + _topTop._x, y + _topTop._y);
-            _ctx.lineTo(x + _topRight._x, y + _topRight._y);
-            _ctx.lineTo(x + _bottomRight._x, y + _bottomRight._y);
-            _ctx.lineTo(x + _bottomBottom._x, y + _bottomBottom._y);
-            _ctx.lineTo(x + _bottomLeft._x, y + _bottomLeft._y);
-            _ctx.closePath();
-            _ctx.stroke();
-
-            // Highlight
-            _ctx.strokeStyle = palette.highlight;
-            _ctx.beginPath();
-            _ctx.moveTo(x + _topLeft._x, y + _topLeft._y);
-            _ctx.lineTo(x + _topBottom._x, y + _topBottom._y);
-            _ctx.lineTo(x + _topRight._x, y + _topRight._y);
-            _ctx.moveTo(x + _topBottom._x, y + _topBottom._y);
-            _ctx.lineTo(x + _bottomBottom._x, y + _bottomBottom._y);
-            _ctx.stroke();
+            drawSlantedLineDown(x, y + _offset + _pixelHeight, _pixelHalfWidth, palette.outline);
+            drawSlantedLineUp(x + _pixelHalfWidth - 1, y + _offset * 2 + _pixelHeight, _pixelHalfWidth, palette.outline);
 
         }
     }
