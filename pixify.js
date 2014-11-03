@@ -1,20 +1,32 @@
 (function(window) {
 
     function hslToRgb(h, s, l) {
-        var r, g, b;
+        var r;
+        var g;
+        var b;
 
-        if (s == 0) {
+        function hue2rgb(p, q, t) {
+            if (t < 0) {
+                t += 1;
+            }
+            if (t > 1) {
+                t -= 1;
+            }
+            if (t < 1 / 6) {
+                return p + (q - p) * 6 * t;
+            }
+            if (t < 1 / 2) {
+                return q;
+            }
+            if (t < 2 / 3) {
+                return p + (q - p) * (2 / 3 - t) * 6;
+            }
+            return p;
+        }
+
+        if (s === 0) {
             r = g = b = l; // achromatic
         } else {
-            function hue2rgb(p, q, t) {
-                if (t < 0) t += 1;
-                if (t > 1) t -= 1;
-                if (t < 1 / 6) return p + (q - p) * 6 * t;
-                if (t < 1 / 2) return q;
-                if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-                return p;
-            }
-
             var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
             var p = 2 * l - q;
             r = hue2rgb(p, q, h + 1 / 3);
@@ -26,12 +38,16 @@
     }
 
     function rgbToHsl(r, g, b) {
-        r /= 255, g /= 255, b /= 255;
-        var max = Math.max(r, g, b),
-            min = Math.min(r, g, b);
-        var h, s, l = (max + min) / 2;
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        var max = Math.max(r, g, b);
+        var min = Math.min(r, g, b);
+        var h;
+        var s;
+        var l = (max + min) / 2;
 
-        if (max == min) {
+        if (max === min) {
             h = s = 0; // achromatic
         } else {
             var d = max - min;
@@ -65,20 +81,42 @@
         this._xPos = 0;
         this._yPos = 0;
         this._color = [0, 0, 0];
+
+        this._maxX = -1;
+        this._minX = 1000000;
+        this._maxY = -1;
+        this._minY = 1000000;
     }
 
     PixelDrawer.prototype.flush = function() {
         this._imageData = this._context.createImageData(this._width, this._height);
     };
 
+    PixelDrawer.prototype.storeExtremes = function() {
+        if (this._xPos < this._minX) {
+            this._minX = this._xPos;
+        }
+        if (this._xPos > this._maxX) {
+            this._maxX = this._xPos;
+        }
+
+        if (this._yPos < this._minY) {
+            this._minY = this._yPos;
+        } else if (this._yPos > this._maxY) {
+            this._maxY = this._yPos;
+        }
+    };
+
     PixelDrawer.prototype.moveTo = function(x, y) {
         this._xPos = x;
         this._yPos = y;
+        this.storeExtremes();
     };
 
     PixelDrawer.prototype.moveRelativeTo = function(x, y) {
         this._xPos += x;
         this._yPos += y;
+        this.storeExtremes();
     };
 
     PixelDrawer.prototype.setColor = function(color) {
@@ -103,6 +141,7 @@
             this._yPos--;
             this._xPos += 2;
         }
+        this.storeExtremes();
     };
 
     PixelDrawer.prototype.drawSlantedLineDown = function(distance) {
@@ -113,6 +152,7 @@
             this._yPos++;
             this._xPos += 2;
         }
+        this.storeExtremes();
     };
 
     PixelDrawer.prototype.drawVerticalLine = function(distance) {
@@ -121,16 +161,18 @@
             this.setPixel(this._xPos, this._yPos, this._color);
             this._yPos++;
         }
+        this.storeExtremes();
     };
 
     PixelDrawer.prototype.render = function() {
-        this._context.putImageData(this._imageData, 0, 0);
+        var xOffset = (this._width / 2) - (((this._maxX - this._minX) / 2) + this._minX);
+        var yOffset = (this._height / 2) - (((this._maxY - this._minY) / 2) + this._minY);
+        this._context.putImageData(this._imageData, xOffset, yOffset);
     };
 
     function Pixify(canvas, image) {
         var _canvas = canvas;
         var _ctx = _canvas.getContext('2d');
-        var _imageData = _ctx.createImageData(_canvas.width, _canvas.height);
         var _pixelDrawer = new PixelDrawer(_ctx, _canvas.width, _canvas.height);
 
         var _spriteCanvas = createCanvas();
@@ -142,21 +184,11 @@
         _spriteCanvas.height = yRes;
         _spriteCtx.drawImage(image, 0, 0, xRes, yRes);
 
+        // Todo: Figure out something smart
         var _gap = 14;
         var _pixelHeight = 40;
+        var _pixelHalfWidth = 32;
 
-        var _pixelHalfWidthW = Math.round((_canvas.width - (xRes + yRes - 2) * _gap) / (xRes + yRes));
-        var _pixelHalfWidthH =  Math.round((_canvas.height - _pixelHeight - (xRes + yRes - 1) * _gap) / (xRes + yRes));
-
-        if (_pixelHalfWidthW % 2 !== 0) {
-            _pixelHalfWidthW--;
-        }
-
-        if (_pixelHalfWidthH % 2 !== 0) {
-            _pixelHalfWidthH--;
-        }
-
-        var _pixelHalfWidth = Math.min(_pixelHalfWidthW, _pixelHalfWidthH);
         var _pixelWidth = _pixelHalfWidth * 2 - 1;
         var _offset = _pixelHalfWidth / 2 - 1;
         var _distance = _pixelHalfWidth + _gap;
@@ -184,17 +216,16 @@
                 right: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.4),
                 highlight: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 1.3),
                 outline: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.1)
-            }
+            };
         }
 
         function pixel2pixel(x, y, color) {
             if (color[0] === 0 && color[1] === 0 && color[2] === 0) {
                 return;
             }
+            window.console.log(color);
 
             var palette = getColorPalette(color);
-
-            // _pixelHeight = Math.round(Math.random() * 75 + 5);
 
             _pixelDrawer.setColor(palette.left);
             for (var i = 1; i < _pixelHeight; i++) {
@@ -203,13 +234,13 @@
             }
 
             _pixelDrawer.setColor(palette.right);
-            for (var i = 1; i < _pixelHeight; i++) {
+            for (i = 1; i < _pixelHeight; i++) {
                 _pixelDrawer.moveTo(x + _pixelHalfWidth - 1, y + _offset + i - _pixelHeight);
                 _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth);
             }
 
             _pixelDrawer.setColor(palette.top);
-            for (var i = 1; i < _pixelHalfWidth - 1; i++) {
+            for (i = 1; i < _pixelHalfWidth - 1; i++) {
                 _pixelDrawer.moveTo(x + i * 2, y - _pixelHeight);
                 _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth - i - 1);
                 _pixelDrawer.moveTo(x + i * 2, y - _pixelHeight);
