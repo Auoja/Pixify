@@ -57,10 +57,77 @@
         return document.createElement('canvas');
     }
 
+    function PixelDrawer(context, width, height) {
+        this._context = context;
+        this._width = width;
+        this._height = height;
+        this._imageData = this._context.createImageData(width, height);
+        this._xPos = 0;
+        this._yPos = 0;
+        this._color = [0, 0, 0];
+    }
+
+    PixelDrawer.prototype.moveTo = function(x, y) {
+        this._xPos = x;
+        this._yPos = y;
+    };
+
+    PixelDrawer.prototype.moveRelativeTo = function(x, y) {
+        this._xPos += x;
+        this._yPos += y;
+    };
+
+    PixelDrawer.prototype.setColor = function(color) {
+        this._color = color;
+    };
+
+    PixelDrawer.prototype.setPixel = function(x, y, color) {
+        if (x >= 0 && x < this._width && y >= 0 && y < this._height) {
+            var index = (x + y * this._imageData.width) * 4;
+            this._imageData.data[index + 0] = color[0];
+            this._imageData.data[index + 1] = color[1];
+            this._imageData.data[index + 2] = color[2];
+            this._imageData.data[index + 3] = 255;
+        }
+    };
+
+    PixelDrawer.prototype.drawSlantedLineUp = function(distance) {
+        var start = this._xPos;
+        while (this._xPos < start + distance) {
+            this.setPixel(this._xPos, this._yPos, this._color);
+            this.setPixel(this._xPos + 1, this._yPos, this._color);
+            this._yPos--;
+            this._xPos += 2;
+        }
+    };
+
+    PixelDrawer.prototype.drawSlantedLineDown = function(distance) {
+        var start = this._xPos;
+        while (this._xPos < start + distance) {
+            this.setPixel(this._xPos, this._yPos, this._color);
+            this.setPixel(this._xPos + 1, this._yPos, this._color);
+            this._yPos++;
+            this._xPos += 2;
+        }
+    };
+
+    PixelDrawer.prototype.drawVerticalLine = function(distance) {
+        var start = this._yPos;
+        while (this._yPos < start + distance) {
+            this.setPixel(this._xPos, this._yPos, this._color);
+            this._yPos++;
+        }
+    };
+
+    PixelDrawer.prototype.render = function() {
+        this._context.putImageData(this._imageData, 0, 0);
+    };
+
     function Pixify(canvas, image) {
         var _canvas = canvas;
         var _ctx = _canvas.getContext('2d');
         var _imageData = _ctx.createImageData(_canvas.width, _canvas.height);
+        var _pixelDrawer = new PixelDrawer(_ctx, _canvas.width, _canvas.height);
 
         var _spriteCanvas = createCanvas();
         var _spriteCtx = _spriteCanvas.getContext('2d');
@@ -74,7 +141,7 @@
         var _pixelHalfWidth = 46;
         var _pixelWidth = _pixelHalfWidth * 2 - 1;
         var _pixelHeight = 50;
-        var _gap = 0;
+        var _gap = 10;
         var _offset = _pixelHalfWidth / 2 - 1;
 
         var _distance = _pixelHalfWidth + _gap;
@@ -86,45 +153,7 @@
             }
         }
 
-        _ctx.putImageData(_imageData, 0, 0);
-
-        function setPixel(x, y, color) {
-            if (x >= 0 && x < _canvas.width && y >= 0 && y < _canvas.height) {
-                var index = (x + y * _imageData.width) * 4;
-                _imageData.data[index + 0] = color[0];
-                _imageData.data[index + 1] = color[1];
-                _imageData.data[index + 2] = color[2];
-                _imageData.data[index + 3] = 255;
-            }
-        }
-
-        function drawSlantedLineUp(x, y, distance, color) {
-            var start = x;
-            while (x < start + distance) {
-                setPixel(x, y, color);
-                setPixel(x + 1, y, color);
-                y--;
-                x += 2;
-            }
-        }
-
-        function drawSlantedLineDown(x, y, distance, color) {
-            var start = x;
-            while (x < start + distance) {
-                setPixel(x, y, color);
-                setPixel(x + 1, y, color);
-                y++;
-                x += 2;
-            }
-        }
-
-        function drawVerticalLine(x, y, distance, color) {
-            var start = y;
-            while (y < start + distance) {
-                setPixel(x, y, color);
-                y++;
-            }
-        }
+        _pixelDrawer.render();
 
         function getColorPalette(color) {
             var hslColor = rgbToHsl(color[0], color[1], color[2]);
@@ -144,30 +173,46 @@
 
             var palette = getColorPalette(color);
 
+            _pixelDrawer.setColor(palette.left);
             for (var i = 1; i < _pixelHeight; i++) {
-                drawSlantedLineDown(x, y + _offset + i, _pixelHalfWidth, palette.left);
+                _pixelDrawer.moveTo(x, y + i);
+                _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth);
             }
 
+            _pixelDrawer.setColor(palette.right);
             for (var i = 1; i < _pixelHeight; i++) {
-                drawSlantedLineUp(x + _pixelHalfWidth - 1, y + _offset * 2 + i, _pixelHalfWidth, palette.right);
+                _pixelDrawer.moveTo(x+ _pixelHalfWidth - 1, y + _offset + i);
+                _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth);
             }
 
+            _pixelDrawer.setColor(palette.top);
             for (var i = 1; i < _pixelHalfWidth - 1; i++) {
-                drawSlantedLineUp(x + i * 2, y + _offset, _pixelHalfWidth - i - 1, palette.top);
-                drawSlantedLineDown(x + i * 2, y + _offset, _pixelHalfWidth - i - 1, palette.top);
+                _pixelDrawer.moveTo(x + i * 2, y);
+                _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth - i - 1);
+                _pixelDrawer.moveTo(x + i * 2, y);
+                _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth - i - 1);
             }
 
-            drawSlantedLineUp(x, y + _offset, _pixelHalfWidth, palette.outline);
-            drawSlantedLineDown(x + _pixelHalfWidth - 1, y, _pixelHalfWidth, palette.outline);
-            drawSlantedLineDown(x + 2, y + _offset + 1, _pixelHalfWidth - 2, palette.highlight);
-            drawSlantedLineUp(x + _pixelHalfWidth - 1, y + 2 * _offset, _pixelHalfWidth - 2, palette.highlight);
+            _pixelDrawer.setColor(palette.outline);
+            _pixelDrawer.moveTo(x, y);
+            _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth);
+            _pixelDrawer.moveRelativeTo(-1, 1);
+            _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth);
+            _pixelDrawer.moveTo(x, y);
+            _pixelDrawer.drawVerticalLine(_pixelHeight);
+            _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth);
+            _pixelDrawer.moveRelativeTo(-1, -1);
+            _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth);
+            _pixelDrawer.moveTo(x + _pixelWidth - 1, y);
+            _pixelDrawer.drawVerticalLine(_pixelHeight);
 
-            drawVerticalLine(x, y + _offset, _pixelHeight, palette.outline);
-            drawVerticalLine(x + _pixelHalfWidth - 1, y + 2 * _offset, _pixelHeight, palette.highlight);
-            drawVerticalLine(x + _pixelWidth - 1, y + _offset, _pixelHeight, palette.outline);
-
-            drawSlantedLineDown(x, y + _offset + _pixelHeight, _pixelHalfWidth, palette.outline);
-            drawSlantedLineUp(x + _pixelHalfWidth - 1, y + _offset * 2 + _pixelHeight, _pixelHalfWidth, palette.outline);
+            _pixelDrawer.moveTo(x + 2, y + 1);
+            _pixelDrawer.setColor(palette.highlight);
+            _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth - 2);
+            _pixelDrawer.moveRelativeTo(-1, -1);
+            _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth - 2);
+            _pixelDrawer.moveTo(x + _pixelHalfWidth - 1, y + _offset);
+            _pixelDrawer.drawVerticalLine(_pixelHeight);
 
         }
     }
