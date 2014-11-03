@@ -142,19 +142,35 @@
         _spriteCanvas.height = yRes;
         _spriteCtx.drawImage(image, 0, 0, xRes, yRes);
 
-        var _pixelHalfWidth = 36;
-        var _pixelWidth = _pixelHalfWidth * 2 - 1;
+        var _gap = 14;
         var _pixelHeight = 40;
+
+        var _pixelHalfWidthW = Math.round((_canvas.width - (xRes + yRes - 2) * _gap) / (xRes + yRes));
+        var _pixelHalfWidthH =  Math.round((_canvas.height - _pixelHeight - (xRes + yRes - 1) * _gap) / (xRes + yRes));
+
+        if (_pixelHalfWidthW % 2 !== 0) {
+            _pixelHalfWidthW--;
+        }
+
+        if (_pixelHalfWidthH % 2 !== 0) {
+            _pixelHalfWidthH--;
+        }
+
+        var _pixelHalfWidth = Math.min(_pixelHalfWidthW, _pixelHalfWidthH);
+        var _pixelWidth = _pixelHalfWidth * 2 - 1;
         var _offset = _pixelHalfWidth / 2 - 1;
-        var _gap = 0;
         var _distance = _pixelHalfWidth + _gap;
 
         this.render = function() {
             _pixelDrawer.flush();
+
+            var yOffset = 300;
+            var xOffset = 0;
+
             for (var j = 0; j < _spriteCanvas.height; j++) {
                 for (var i = _spriteCanvas.width; i >= 0; i--) {
                     var data = _spriteCtx.getImageData(i, j, 1, 1).data;
-                    pixel2pixel((i + j) * _distance, 400 + (j * 0.5 - i * 0.5) * _distance, [data[0], data[1], data[2]]);
+                    pixel2pixel(xOffset + (i + j) * _distance, yOffset + (j * 0.5 - i * 0.5) * _distance, [data[0], data[1], data[2]]);
                 }
             }
             _pixelDrawer.render();
