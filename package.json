@@ -1,0 +1,22 @@
+{
+  "name": "pixify",
+  "version": "1.0.0",
+  "description": "A tool for making pixel art from pixel art",
+  "main": "pixify.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Auoja/Pixify.git"
+  },
+  "author": "Anton Auoja <antonauoja@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Auoja/Pixify/issues"
+  },
+  "homepage": "https://github.com/Auoja/Pixify",
+  "devDependencies": {
+    "ecstatic": "^0.5.5"
+  }
+}
