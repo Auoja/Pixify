@@ -61,11 +61,15 @@
         this._context = context;
         this._width = width;
         this._height = height;
-        this._imageData = this._context.createImageData(width, height);
+        this._imageData = this._context.createImageData(this._width, this._height);
         this._xPos = 0;
         this._yPos = 0;
         this._color = [0, 0, 0];
     }
+
+    PixelDrawer.prototype.flush = function() {
+        this._imageData = this._context.createImageData(this._width, this._height);
+    };
 
     PixelDrawer.prototype.moveTo = function(x, y) {
         this._xPos = x;
@@ -138,22 +142,23 @@
         _spriteCanvas.height = yRes;
         _spriteCtx.drawImage(image, 0, 0, xRes, yRes);
 
-        var _pixelHalfWidth = 46;
+        var _pixelHalfWidth = 36;
         var _pixelWidth = _pixelHalfWidth * 2 - 1;
-        var _pixelHeight = 50;
-        var _gap = 10;
+        var _pixelHeight = 40;
         var _offset = _pixelHalfWidth / 2 - 1;
-
+        var _gap = 0;
         var _distance = _pixelHalfWidth + _gap;
 
-        for (var j = 0; j < _spriteCanvas.height; j++) {
-            for (var i = _spriteCanvas.width; i >= 0; i--) {
-                var data = _spriteCtx.getImageData(i, j, 1, 1).data;
-                pixel2pixel((i + j) * _distance, 400 + (j * 0.5 - i * 0.5) * _distance, [data[0], data[1], data[2]]);
+        this.render = function() {
+            _pixelDrawer.flush();
+            for (var j = 0; j < _spriteCanvas.height; j++) {
+                for (var i = _spriteCanvas.width; i >= 0; i--) {
+                    var data = _spriteCtx.getImageData(i, j, 1, 1).data;
+                    pixel2pixel((i + j) * _distance, 400 + (j * 0.5 - i * 0.5) * _distance, [data[0], data[1], data[2]]);
+                }
             }
-        }
-
-        _pixelDrawer.render();
+            _pixelDrawer.render();
+        };
 
         function getColorPalette(color) {
             var hslColor = rgbToHsl(color[0], color[1], color[2]);
@@ -183,7 +188,7 @@
 
             _pixelDrawer.setColor(palette.right);
             for (var i = 1; i < _pixelHeight; i++) {
-                _pixelDrawer.moveTo(x+ _pixelHalfWidth - 1, y + _offset + i - _pixelHeight);
+                _pixelDrawer.moveTo(x + _pixelHalfWidth - 1, y + _offset + i - _pixelHeight);
                 _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth);
             }
 
