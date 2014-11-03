@@ -168,6 +168,7 @@
         var xOffset = (this._width / 2) - (((this._maxX - this._minX) / 2) + this._minX);
         var yOffset = (this._height / 2) - (((this._maxY - this._minY) / 2) + this._minY);
         this._context.putImageData(this._imageData, xOffset, yOffset);
+        // this._context.putImageData(this._imageData, 0, 0);
     };
 
     function Pixify(canvas, image) {
@@ -184,11 +185,22 @@
         _spriteCanvas.height = yRes;
         _spriteCtx.drawImage(image, 0, 0, xRes, yRes);
 
-        // Todo: Figure out something smart
-        var _gap = 14;
+        var _gap = 8;
         var _pixelHeight = 40;
-        var _pixelHalfWidth = 32;
 
+        var _pixelHalfWidthW = Math.floor((_canvas.width - _gap * (xRes + yRes - 2)) / (xRes + yRes));
+        var _pixelHalfWidthH = Math.floor((2 * (_canvas.height + xRes + yRes) - _gap * (xRes + yRes - 2)) / (xRes + yRes));
+
+        if (_pixelHalfWidthW % 2 !== 0) {
+            _pixelHalfWidthW--;
+        }
+
+        if (_pixelHalfWidthH % 2 !== 0) {
+            _pixelHalfWidthH--;
+        }
+
+
+        var _pixelHalfWidth = Math.min(_pixelHalfWidthH, _pixelHalfWidthW);
         var _pixelWidth = _pixelHalfWidth * 2 - 1;
         var _offset = _pixelHalfWidth / 2 - 1;
         var _distance = _pixelHalfWidth + _gap;
@@ -199,8 +211,8 @@
             var yOffset = 300;
             var xOffset = 0;
 
-            for (var j = 0; j < _spriteCanvas.height; j++) {
-                for (var i = _spriteCanvas.width; i >= 0; i--) {
+            for (var j = 0; j < yRes; j++) {
+                for (var i = xRes - 1; i >= 0; i--) {
                     var data = _spriteCtx.getImageData(i, j, 1, 1).data;
                     pixel2pixel(xOffset + (i + j) * _distance, yOffset + (j * 0.5 - i * 0.5) * _distance, [data[0], data[1], data[2]]);
                 }
