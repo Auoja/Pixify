@@ -11,6 +11,6 @@ function startDemo() {
     image.onload = function() {
         var pix = new Pixify(canvas, image);
     };
-    image.src = "test.png";
+    image.src = "mario.png";
 
 }
