@@ -174,7 +174,7 @@
         var _canvas = canvas;
         var _ctx = _canvas.getContext('2d');
         var _pixelDrawer = new PixelDrawer(_ctx, _canvas.width, _canvas.height);
-
+        var _colorLUT = {};
         var _spriteCanvas = createCanvas();
         var _spriteCtx = _spriteCanvas.getContext('2d');
         var xRes = image.width;
@@ -209,21 +209,25 @@
         };
 
         function getColorPalette(color) {
-            var hslColor = rgbToHsl(color[0], color[1], color[2]);
-            return {
-                top: color,
-                left: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.7),
-                right: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.4),
-                highlight: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 1.3),
-                outline: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.1)
-            };
+            var hash = color.toString();
+            if (!_colorLUT[hash]) {
+                var hslColor = rgbToHsl(color[0], color[1], color[2]);
+                var colors = {
+                    top: color,
+                    left: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.7),
+                    right: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.4),
+                    highlight: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 1.3),
+                    outline: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.1)
+                };
+                _colorLUT[hash] = colors;
+            }
+            return _colorLUT[hash];
         }
 
         function pixel2pixel(x, y, color) {
             if (color[0] === 0 && color[1] === 0 && color[2] === 0) {
                 return;
             }
-            window.console.log(color);
 
             var palette = getColorPalette(color);
 
