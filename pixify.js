@@ -149,7 +149,7 @@
         for (var j = 0; j < _spriteCanvas.height; j++) {
             for (var i = _spriteCanvas.width; i >= 0; i--) {
                 var data = _spriteCtx.getImageData(i, j, 1, 1).data;
-                pixel2pixel((i + j) * _distance, 300 + (j * 0.5 - i * 0.5) * _distance, [data[0], data[1], data[2]]);
+                pixel2pixel((i + j) * _distance, 400 + (j * 0.5 - i * 0.5) * _distance, [data[0], data[1], data[2]]);
             }
         }
 
@@ -161,7 +161,7 @@
                 top: color,
                 left: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.7),
                 right: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.4),
-                highlight: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 1.8),
+                highlight: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 1.3),
                 outline: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.1)
             }
         }
@@ -173,47 +173,54 @@
 
             var palette = getColorPalette(color);
 
+            // _pixelHeight = Math.round(Math.random() * 75 + 5);
+
             _pixelDrawer.setColor(palette.left);
             for (var i = 1; i < _pixelHeight; i++) {
-                _pixelDrawer.moveTo(x, y + i);
+                _pixelDrawer.moveTo(x, y + i - _pixelHeight);
                 _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth);
             }
 
             _pixelDrawer.setColor(palette.right);
             for (var i = 1; i < _pixelHeight; i++) {
-                _pixelDrawer.moveTo(x+ _pixelHalfWidth - 1, y + _offset + i);
+                _pixelDrawer.moveTo(x+ _pixelHalfWidth - 1, y + _offset + i - _pixelHeight);
                 _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth);
             }
 
             _pixelDrawer.setColor(palette.top);
             for (var i = 1; i < _pixelHalfWidth - 1; i++) {
-                _pixelDrawer.moveTo(x + i * 2, y);
+                _pixelDrawer.moveTo(x + i * 2, y - _pixelHeight);
                 _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth - i - 1);
-                _pixelDrawer.moveTo(x + i * 2, y);
+                _pixelDrawer.moveTo(x + i * 2, y - _pixelHeight);
                 _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth - i - 1);
             }
 
             _pixelDrawer.setColor(palette.outline);
+
             _pixelDrawer.moveTo(x, y);
+            _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth);
+            _pixelDrawer.moveRelativeTo(-1, -1);
+            _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth);
+
+            _pixelDrawer.moveTo(x, y - _pixelHeight);
+            _pixelDrawer.drawVerticalLine(_pixelHeight);
+
+            _pixelDrawer.moveTo(x + _pixelWidth - 1, y - _pixelHeight);
+            _pixelDrawer.drawVerticalLine(_pixelHeight);
+
+            _pixelDrawer.moveTo(x, y - _pixelHeight);
             _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth);
             _pixelDrawer.moveRelativeTo(-1, 1);
             _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth);
-            _pixelDrawer.moveTo(x, y);
-            _pixelDrawer.drawVerticalLine(_pixelHeight);
-            _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth);
-            _pixelDrawer.moveRelativeTo(-1, -1);
-            _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth);
-            _pixelDrawer.moveTo(x + _pixelWidth - 1, y);
-            _pixelDrawer.drawVerticalLine(_pixelHeight);
 
-            _pixelDrawer.moveTo(x + 2, y + 1);
             _pixelDrawer.setColor(palette.highlight);
+
+            _pixelDrawer.moveTo(x + 2, y - _pixelHeight + 1);
             _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth - 2);
             _pixelDrawer.moveRelativeTo(-1, -1);
             _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth - 2);
-            _pixelDrawer.moveTo(x + _pixelHalfWidth - 1, y + _offset);
+            _pixelDrawer.moveTo(x + _pixelHalfWidth - 1, y + _offset - _pixelHeight);
             _pixelDrawer.drawVerticalLine(_pixelHeight);
-
         }
     }
 

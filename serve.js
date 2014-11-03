@@ -1,10 +1,12 @@
 var http = require('http');
 var ecstatic = require('ecstatic');
 
+var port = 8081;
+
 http.createServer(
     ecstatic({
         root: __dirname
     })
-).listen(8080);
+).listen(port);
 
-console.log('http://localhost:8080/demo');
+console.log('http://localhost:' + port + '/demo');
