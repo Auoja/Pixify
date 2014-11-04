@@ -81,42 +81,20 @@
         this._xPos = 0;
         this._yPos = 0;
         this._color = [0, 0, 0];
-
-        this._maxX = -1;
-        this._minX = 1000000;
-        this._maxY = -1;
-        this._minY = 1000000;
     }
 
     PixelDrawer.prototype.flush = function() {
         this._imageData = this._context.createImageData(this._width, this._height);
     };
 
-    PixelDrawer.prototype.storeExtremes = function() {
-        if (this._xPos < this._minX) {
-            this._minX = this._xPos;
-        }
-        if (this._xPos > this._maxX) {
-            this._maxX = this._xPos;
-        }
-
-        if (this._yPos < this._minY) {
-            this._minY = this._yPos;
-        } else if (this._yPos > this._maxY) {
-            this._maxY = this._yPos;
-        }
-    };
-
     PixelDrawer.prototype.moveTo = function(x, y) {
         this._xPos = x;
         this._yPos = y;
-        this.storeExtremes();
     };
 
     PixelDrawer.prototype.moveRelativeTo = function(x, y) {
         this._xPos += x;
         this._yPos += y;
-        this.storeExtremes();
     };
 
     PixelDrawer.prototype.setColor = function(color) {
@@ -141,7 +119,6 @@
             this._yPos--;
             this._xPos += 2;
         }
-        this.storeExtremes();
     };
 
     PixelDrawer.prototype.drawSlantedLineDown = function(distance) {
@@ -152,7 +129,6 @@
             this._yPos++;
             this._xPos += 2;
         }
-        this.storeExtremes();
     };
 
     PixelDrawer.prototype.drawVerticalLine = function(distance) {
@@ -161,64 +137,65 @@
             this.setPixel(this._xPos, this._yPos, this._color);
             this._yPos++;
         }
-        this.storeExtremes();
     };
 
     PixelDrawer.prototype.render = function() {
-        var xOffset = (this._width / 2) - (((this._maxX - this._minX) / 2) + this._minX);
-        var yOffset = (this._height / 2) - (((this._maxY - this._minY) / 2) + this._minY);
-        this._context.putImageData(this._imageData, xOffset, yOffset);
-        // this._context.putImageData(this._imageData, 0, 0);
+        this._context.putImageData(this._imageData, 0, 0);
     };
 
-    function Pixify(canvas, image) {
+    function Pixify(canvas, image, pixelSide, gap) {
         var _canvas = canvas;
         var _ctx = _canvas.getContext('2d');
-        var _pixelDrawer = new PixelDrawer(_ctx, _canvas.width, _canvas.height);
         var _colorLUT = {};
-        var _spriteCanvas = createCanvas();
-        var _spriteCtx = _spriteCanvas.getContext('2d');
-        var xRes = image.width;
-        var yRes = image.height;
+        var _spriteCanvas;
+        var _spriteCtx;
+        var _xRes;
+        var _yRes;
 
-        _spriteCanvas.width = xRes;
-        _spriteCanvas.height = yRes;
-        _spriteCtx.drawImage(image, 0, 0, xRes, yRes);
+        var _padding = 10;
 
-        var _gap = 8;
-        var _pixelHeight = 40;
+        var _gap = gap || 0;
+        var _pixelSide = pixelSide || 32;
 
-        var _pixelHalfWidthW = Math.floor((_canvas.width - _gap * (xRes + yRes - 2)) / (xRes + yRes));
-        var _pixelHalfWidthH = Math.floor((2 * (_canvas.height + xRes + yRes) - _gap * (xRes + yRes - 2)) / (xRes + yRes));
+        var _pixelHeight = _pixelSide;
+        var _pixelWidth = _pixelSide * 2 - 1;
+        var _offset = _pixelSide / 2;
+        var _distance = _pixelSide + _gap;
 
-        if (_pixelHalfWidthW % 2 !== 0) {
-            _pixelHalfWidthW--;
-        }
+        setupSpriteCanvas(image);
 
-        if (_pixelHalfWidthH % 2 !== 0) {
-            _pixelHalfWidthH--;
-        }
+        _canvas.width = 2 * _padding + _pixelSide * (_xRes + _yRes) + _gap * (_xRes + _yRes - 2);
+        _canvas.height = 2 * _padding + _offset * (_xRes + _yRes) + (_gap / 2) * (_xRes + _yRes - 2) + _pixelHeight;
 
-
-        var _pixelHalfWidth = Math.min(_pixelHalfWidthH, _pixelHalfWidthW);
-        var _pixelWidth = _pixelHalfWidth * 2 - 1;
-        var _offset = _pixelHalfWidth / 2 - 1;
-        var _distance = _pixelHalfWidth + _gap;
+        var _pixelDrawer = new PixelDrawer(_ctx, _canvas.width, _canvas.height);
 
         this.render = function() {
             _pixelDrawer.flush();
 
-            var yOffset = 300;
-            var xOffset = 0;
+            var offset = {
+                x: _padding,
+                y: _padding + _xRes * _offset + (_gap / 2) * (_xRes - 1) + _pixelHeight
+            };
 
-            for (var j = 0; j < yRes; j++) {
-                for (var i = xRes - 1; i >= 0; i--) {
+            for (var j = 0; j < _yRes; j++) {
+                for (var i = _xRes - 1; i >= 0; i--) {
                     var data = _spriteCtx.getImageData(i, j, 1, 1).data;
-                    pixel2pixel(xOffset + (i + j) * _distance, yOffset + (j * 0.5 - i * 0.5) * _distance, [data[0], data[1], data[2]]);
+                    pixel2pixel(offset.x + (i + j) * _distance, offset.y + (j * 0.5 - i * 0.5) * _distance, [data[0], data[1], data[2]]);
                 }
             }
             _pixelDrawer.render();
         };
+
+        function setupSpriteCanvas(image) {
+            _spriteCanvas = createCanvas();
+            _spriteCtx = _spriteCanvas.getContext('2d');
+            _xRes = image.width;
+            _yRes = image.height;
+
+            _spriteCanvas.width = _xRes;
+            _spriteCanvas.height = _yRes;
+            _spriteCtx.drawImage(image, 0, 0, _xRes, _yRes);
+        }
 
         function getColorPalette(color) {
             var hash = color.toString();
@@ -236,8 +213,15 @@
             return _colorLUT[hash];
         }
 
-        function pixel2pixel(x, y, color) {
+        function shouldRenderColor(color) {
             if (color[0] === 0 && color[1] === 0 && color[2] === 0) {
+                return false;
+            }
+            return true;
+        }
+
+        function pixel2pixel(x, y, color) {
+            if (!shouldRenderColor(color)) {
                 return;
             }
 
@@ -246,29 +230,29 @@
             _pixelDrawer.setColor(palette.left);
             for (var i = 1; i < _pixelHeight; i++) {
                 _pixelDrawer.moveTo(x, y + i - _pixelHeight);
-                _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth);
+                _pixelDrawer.drawSlantedLineDown(_pixelSide);
             }
 
             _pixelDrawer.setColor(palette.right);
             for (i = 1; i < _pixelHeight; i++) {
-                _pixelDrawer.moveTo(x + _pixelHalfWidth - 1, y + _offset + i - _pixelHeight);
-                _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth);
+                _pixelDrawer.moveTo(x + _pixelSide - 1, y + _offset - 1 + i - _pixelHeight);
+                _pixelDrawer.drawSlantedLineUp(_pixelSide);
             }
 
             _pixelDrawer.setColor(palette.top);
-            for (i = 1; i < _pixelHalfWidth - 1; i++) {
+            for (i = 1; i < _pixelSide - 1; i++) {
                 _pixelDrawer.moveTo(x + i * 2, y - _pixelHeight);
-                _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth - i - 1);
+                _pixelDrawer.drawSlantedLineUp(_pixelSide - i - 1);
                 _pixelDrawer.moveTo(x + i * 2, y - _pixelHeight);
-                _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth - i - 1);
+                _pixelDrawer.drawSlantedLineDown(_pixelSide - i - 1);
             }
 
             _pixelDrawer.setColor(palette.outline);
 
             _pixelDrawer.moveTo(x, y);
-            _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth);
+            _pixelDrawer.drawSlantedLineDown(_pixelSide);
             _pixelDrawer.moveRelativeTo(-1, -1);
-            _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth);
+            _pixelDrawer.drawSlantedLineUp(_pixelSide);
 
             _pixelDrawer.moveTo(x, y - _pixelHeight);
             _pixelDrawer.drawVerticalLine(_pixelHeight);
@@ -277,17 +261,17 @@
             _pixelDrawer.drawVerticalLine(_pixelHeight);
 
             _pixelDrawer.moveTo(x, y - _pixelHeight);
-            _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth);
+            _pixelDrawer.drawSlantedLineUp(_pixelSide);
             _pixelDrawer.moveRelativeTo(-1, 1);
-            _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth);
+            _pixelDrawer.drawSlantedLineDown(_pixelSide);
 
             _pixelDrawer.setColor(palette.highlight);
 
             _pixelDrawer.moveTo(x + 2, y - _pixelHeight + 1);
-            _pixelDrawer.drawSlantedLineDown(_pixelHalfWidth - 2);
+            _pixelDrawer.drawSlantedLineDown(_pixelSide - 2);
             _pixelDrawer.moveRelativeTo(-1, -1);
-            _pixelDrawer.drawSlantedLineUp(_pixelHalfWidth - 2);
-            _pixelDrawer.moveTo(x + _pixelHalfWidth - 1, y + _offset - _pixelHeight);
+            _pixelDrawer.drawSlantedLineUp(_pixelSide - 2);
+            _pixelDrawer.moveTo(x + _pixelSide - 1, y + _offset - 1 - _pixelHeight);
             _pixelDrawer.drawVerticalLine(_pixelHeight);
         }
     }

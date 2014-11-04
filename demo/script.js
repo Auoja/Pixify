@@ -4,7 +4,7 @@ function startDemo() {
 
     var image = new Image();
     image.onload = function() {
-        var pix = new Pixify(canvas, image);
+        var pix = new Pixify(canvas, image, 38, 6);
         pix.render();
     };
     image.src = "mario.png";
