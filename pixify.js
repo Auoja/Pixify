@@ -139,6 +139,14 @@
         }
     };
 
+    PixelDrawer.prototype.drawHorizontalLine = function(distance) {
+        var start = this._xPos;
+        while (this._xPos < start + distance) {
+            this.setPixel(this._xPos, this._yPos, this._color);
+            this._xPos++;
+        }
+    };
+
     PixelDrawer.prototype.render = function() {
         this._context.putImageData(this._imageData, 0, 0);
     };
@@ -206,6 +214,7 @@
                     left: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.7),
                     right: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.4),
                     highlight: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 1.3),
+                    cornerHighlight: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 1.8),
                     outline: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.1)
                 };
                 _colorLUT[hash] = colors;
@@ -273,6 +282,13 @@
             _pixelDrawer.drawSlantedLineUp(_pixelSide - 2);
             _pixelDrawer.moveTo(x + _pixelSide - 1, y + _offset - 1 - _pixelHeight);
             _pixelDrawer.drawVerticalLine(_pixelHeight);
+
+            _pixelDrawer.setColor(palette.cornerHighlight);
+
+            _pixelDrawer.moveTo(x + _pixelSide - 1, y + _offset - 1 - _pixelHeight);
+            _pixelDrawer.drawVerticalLine(3);
+            _pixelDrawer.moveTo(x + _pixelSide - 2, y + _offset - 1 - _pixelHeight);
+            _pixelDrawer.drawHorizontalLine(3);
         }
     }
 
