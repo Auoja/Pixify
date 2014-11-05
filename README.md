@@ -1,6 +1,3 @@
-```
-	$ npm install
-	$ node serve.js
-```
+# Pixify
 
-[http://localhost:8081/demo/](http://localhost:8081/demo/)
+Readme coming soon…

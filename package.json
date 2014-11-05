@@ -15,8 +15,5 @@
   "bugs": {
     "url": "https://github.com/Auoja/Pixify/issues"
   },
-  "homepage": "https://github.com/Auoja/Pixify",
-  "devDependencies": {
-    "ecstatic": "^0.5.5"
-  }
+  "homepage": "https://github.com/Auoja/Pixify"
 }
