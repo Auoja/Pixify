@@ -1,6 +1,21 @@
 (function(window) {
 
-    function hslToRgb(h, s, l) {
+    function ColorHSL(h, s, l, a) {
+        this._h = h || 0;
+        this._s = s || 0;
+        this._l = l || 0;
+        this._a = a || 1;
+    }
+
+    ColorHSL.prototype.darken = function(amount) {
+        return new ColorHSL(this._h, this._s, this._l * (1 - (amount) / 100), 1);
+    };
+
+    ColorHSL.prototype.lighten = function(amount) {
+        return new ColorHSL(this._h, this._s, this._l * (1 + (amount) / 100), 1);
+    };
+
+    ColorHSL.prototype.getRGB = function() {
         var r;
         var g;
         var b;
@@ -24,25 +39,30 @@
             return p;
         }
 
-        if (s === 0) {
-            r = g = b = l; // achromatic
+        if (this._s === 0) {
+            r = g = b = this._l; // achromatic
         } else {
-            var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-            var p = 2 * l - q;
-            r = hue2rgb(p, q, h + 1 / 3);
-            g = hue2rgb(p, q, h);
-            b = hue2rgb(p, q, h - 1 / 3);
+            var q = this._l < 0.5 ? this._l * (1 + this._s) : this._l + this._s - this._l * this._s;
+            var p = 2 * this._l - q;
+            r = hue2rgb(p, q, this._h + 1 / 3);
+            g = hue2rgb(p, q, this._h);
+            b = hue2rgb(p, q, this._h - 1 / 3);
         }
 
-        return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+        return new ColorRGB(r, g, b, 1);
+    };
+
+
+    function ColorRGB(r, g, b, a) {
+        this._r = r;
+        this._g = g;
+        this._b = b;
+        this._a = a;
     }
 
-    function rgbToHsl(r, g, b) {
-        r /= 255;
-        g /= 255;
-        b /= 255;
-        var max = Math.max(r, g, b);
-        var min = Math.min(r, g, b);
+    ColorRGB.prototype.getHSL = function() {
+        var max = Math.max(this._r, this._g, this._b);
+        var min = Math.min(this._r, this._g, this._b);
         var h;
         var s;
         var l = (max + min) / 2;
@@ -53,25 +73,26 @@
             var d = max - min;
             s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
             switch (max) {
-                case r:
-                    h = (g - b) / d + (g < b ? 6 : 0);
+                case this._r:
+                    h = (this._g - this._b) / d + (this._g < this._b ? 6 : 0);
                     break;
-                case g:
-                    h = (b - r) / d + 2;
+                case this._g:
+                    h = (this._b - this._r) / d + 2;
                     break;
-                case b:
-                    h = (r - g) / d + 4;
+                case this._b:
+                    h = (this._r - this._g) / d + 4;
                     break;
             }
             h /= 6;
         }
 
-        return [h, s, l];
-    }
+        return new ColorHSL(h, s, l, 1);
 
-    function createCanvas() {
-        return document.createElement('canvas');
-    }
+    };
+
+    ColorRGB.prototype.getHash = function() {
+        return this._r + "-" + this._g + "-" + this._b + "-" + this._a;
+    };
 
     function PixelDrawer(context, width, height) {
         this._context = context;
@@ -80,7 +101,7 @@
         this._imageData = this._context.createImageData(this._width, this._height);
         this._xPos = 0;
         this._yPos = 0;
-        this._color = [0, 0, 0];
+        this._color = new ColorRGB(0, 0, 0, 1);
     }
 
     PixelDrawer.prototype.flush = function() {
@@ -104,10 +125,10 @@
     PixelDrawer.prototype.setPixel = function(x, y, color) {
         if (x >= 0 && x < this._width && y >= 0 && y < this._height) {
             var index = (x + y * this._imageData.width) * 4;
-            this._imageData.data[index + 0] = color[0];
-            this._imageData.data[index + 1] = color[1];
-            this._imageData.data[index + 2] = color[2];
-            this._imageData.data[index + 3] = 255;
+            this._imageData.data[index + 0] = Math.round(color._r * 255);
+            this._imageData.data[index + 1] = Math.round(color._g * 255);
+            this._imageData.data[index + 2] = Math.round(color._b * 255);
+            this._imageData.data[index + 3] = Math.round(color._a * 255);
         }
     };
 
@@ -188,14 +209,14 @@
             for (var j = 0; j < _yRes; j++) {
                 for (var i = _xRes - 1; i >= 0; i--) {
                     var data = _spriteCtx.getImageData(i, j, 1, 1).data;
-                    pixel2pixel(offset.x + (i + j) * _distance, offset.y + (j * 0.5 - i * 0.5) * _distance, [data[0], data[1], data[2]]);
+                    pixel2pixel(offset.x + (i + j) * _distance, offset.y + (j * 0.5 - i * 0.5) * _distance, new ColorRGB(data[0] / 255, data[1] / 255, data[2] / 255, data[3] / 255));
                 }
             }
             _pixelDrawer.render();
         };
 
         function setupSpriteCanvas(image) {
-            _spriteCanvas = createCanvas();
+            _spriteCanvas = document.createElement('canvas');
             _spriteCtx = _spriteCanvas.getContext('2d');
             _xRes = image.width;
             _yRes = image.height;
@@ -206,16 +227,16 @@
         }
 
         function getColorPalette(color) {
-            var hash = color.toString();
+            var hash = color.getHash();
             if (!_colorLUT[hash]) {
-                var hslColor = rgbToHsl(color[0], color[1], color[2]);
+                var hslColor = color.getHSL();
                 var colors = {
                     top: color,
-                    left: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.7),
-                    right: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.4),
-                    highlight: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 1.3),
-                    cornerHighlight: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 1.8),
-                    outline: hslToRgb(hslColor[0], hslColor[1], hslColor[2] * 0.1)
+                    left: hslColor.darken(30).getRGB(),
+                    right: hslColor.darken(60).getRGB(),
+                    highlight: hslColor.lighten(30).getRGB(),
+                    cornerHighlight: hslColor.lighten(80).getRGB(),
+                    outline: hslColor.darken(90).getRGB()
                 };
                 _colorLUT[hash] = colors;
             }
@@ -223,7 +244,7 @@
         }
 
         function shouldRenderColor(color) {
-            if (color[0] === 0 && color[1] === 0 && color[2] === 0) {
+            if (color._a === 0) {
                 return false;
             }
             return true;
