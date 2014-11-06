@@ -172,8 +172,8 @@
         this._context.putImageData(this._imageData, 0, 0);
     };
 
-    function Pixify(canvas, image, pixelSide, gap) {
-        var _canvas = canvas;
+    function Pixify(opts) {
+        var _canvas = opts.canvas;
         var _ctx = _canvas.getContext('2d');
         var _colorLUT = {};
         var _spriteCanvas;
@@ -183,15 +183,15 @@
 
         var _padding = 10;
 
-        var _gap = gap || 0;
-        var _pixelSide = pixelSide || 32;
+        var _gap = opts.pixelGap || 0;
+        var _pixelSide = opts.pixelSide || 32;
 
         var _pixelHeight = _pixelSide;
         var _pixelWidth = _pixelSide * 2 - 1;
         var _offset = _pixelSide / 2;
         var _distance = _pixelSide + _gap;
 
-        setupSpriteCanvas(image);
+        setupSpriteCanvas(opts.image);
 
         _canvas.width = 2 * _padding + _pixelSide * (_xRes + _yRes) + _gap * (_xRes + _yRes - 2);
         _canvas.height = 2 * _padding + _offset * (_xRes + _yRes) + (_gap / 2) * (_xRes + _yRes - 2) + _pixelHeight;

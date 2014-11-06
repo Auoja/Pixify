@@ -11,7 +11,12 @@ function startDemo() {
         reader.onload = function(event) {
             var image = new Image();
             image.onload = function() {
-                var pix = new Pixify(canvas, image, 38, 6);
+                var pix = new Pixify({
+                    canvas: canvas,
+                    image: image,
+                    pixelSide: 38,
+                    pixelGap: 6
+                });
                 pix.render();
             }
             image.src = event.target.result;
