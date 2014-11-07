@@ -229,33 +229,30 @@
         function getColorPalette(color) {
             var hash = color.getHash();
             if (!_colorLUT[hash]) {
-                var hslColor = color.getHSL();
-                var colors = {
-                    top: color,
-                    left: hslColor.darken(30).getRGB(),
-                    right: hslColor.darken(60).getRGB(),
-                    highlight: hslColor.lighten(30).getRGB(),
-                    cornerHighlight: hslColor.lighten(80).getRGB(),
-                    outline: hslColor.darken(90).getRGB()
-                };
-                _colorLUT[hash] = colors;
+                var palette = null;
+                if (color._a !== 0) {
+                    var hslColor = color.getHSL();
+                    palette = {
+                        top: color,
+                        left: hslColor.darken(30).getRGB(),
+                        right: hslColor.darken(60).getRGB(),
+                        highlight: hslColor.lighten(30).getRGB(),
+                        cornerHighlight: hslColor.lighten(80).getRGB(),
+                        outline: hslColor.darken(90).getRGB()
+                    };
+                }
+                _colorLUT[hash] = palette;
             }
             return _colorLUT[hash];
         }
 
-        function shouldRenderColor(color) {
-            if (color._a === 0) {
-                return false;
-            }
-            return true;
-        }
-
         function pixel2pixel(x, y, color) {
-            if (!shouldRenderColor(color)) {
-                return;
-            }
 
             var palette = getColorPalette(color);
+
+            if (palette === null) {
+                return;
+            }
 
             _pixelDrawer.setColor(palette.left);
             for (var i = 1; i < _pixelHeight; i++) {
