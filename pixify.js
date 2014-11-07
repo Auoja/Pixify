@@ -183,7 +183,7 @@
 
         var _padding = 10;
 
-        var _gap = opts.pixelGap || 0;
+        var _gap = opts.pixelGap % 2 === 0 ? opts.pixelGap : opts.pixelGap - 1 || 0;
         var _pixelSide = opts.pixelSide % 2 === 0 ? opts.pixelSide : opts.pixelSide - 1 || 32;
 
         var _pixelHeight = _pixelSide;
