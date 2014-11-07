@@ -184,7 +184,7 @@
         var _padding = 10;
 
         var _gap = opts.pixelGap || 0;
-        var _pixelSide = opts.pixelSide || 32;
+        var _pixelSide = opts.pixelSide % 2 === 0 ? opts.pixelSide : opts.pixelSide - 1 || 32;
 
         var _pixelHeight = _pixelSide;
         var _pixelWidth = _pixelSide * 2 - 1;
