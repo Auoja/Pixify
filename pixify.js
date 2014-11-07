@@ -193,13 +193,13 @@
 
         setupSpriteCanvas(opts.image);
 
-        _canvas.width = 2 * _padding + _pixelSide * (_xRes + _yRes) + _gap * (_xRes + _yRes - 2);
-        _canvas.height = 2 * _padding + _offset * (_xRes + _yRes) + (_gap / 2) * (_xRes + _yRes - 2) + _pixelHeight;
+        var _pixelDrawer;
 
-        var _pixelDrawer = new PixelDrawer(_ctx, _canvas.width, _canvas.height);
+        this.renderHorizontal = function() {
 
-        this.render = function() {
-            _pixelDrawer.flush();
+            _canvas.width = 2 * _padding + _pixelSide * (_xRes + _yRes - 2) + _gap * (_xRes + _yRes - 2) + _pixelWidth;
+            _canvas.height = 2 * _padding + _offset * (_xRes + _yRes) + (_gap / 2) * (_xRes + _yRes - 2) + _pixelHeight;
+            _pixelDrawer = new PixelDrawer(_ctx, _canvas.width, _canvas.height);
 
             var offset = {
                 x: _padding,
@@ -212,6 +212,28 @@
                     pixel2pixel(offset.x + (i + j) * _distance, offset.y + (j * 0.5 - i * 0.5) * _distance, new ColorRGB(data[0] / 255, data[1] / 255, data[2] / 255, data[3] / 255));
                 }
             }
+
+            _pixelDrawer.render();
+        };
+
+        this.renderVertical = function() {
+
+            _canvas.width = 2 * _padding + _pixelSide * (_xRes - 1) + _gap * (_xRes - 1) + _pixelWidth;
+            _canvas.height = 2 * _padding + _offset * (_xRes + 1) + (_gap / 2) * (_xRes - 1) + _pixelHeight * _yRes + (_gap) * (_yRes - 1) - 1; // Why -1
+            _pixelDrawer = new PixelDrawer(_ctx, _canvas.width, _canvas.height);
+
+            var offset = {
+                x: _padding,
+                y: _padding + (_xRes) * _offset + (_gap / 2) * (_xRes - 1) + _pixelHeight
+            };
+
+            for (var j = _yRes - 1; j >= 0; j--) {
+                for (var i = _xRes - 1; i >= 0; i--) {
+                    var data = _spriteCtx.getImageData(i, j, 1, 1).data;
+                    pixel2pixel(offset.x + i * _distance, offset.y + (j - i * 0.5) * _distance, new ColorRGB(data[0] / 255, data[1] / 255, data[2] / 255, data[3] / 255));
+                }
+            }
+
             _pixelDrawer.render();
         };
 

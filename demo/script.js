@@ -17,7 +17,7 @@ function startDemo() {
                     pixelSide: 38,
                     pixelGap: 6
                 });
-                pix.render();
+                pix.renderVertical();
             }
             image.src = event.target.result;
         }
