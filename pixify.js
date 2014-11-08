@@ -183,6 +183,7 @@
 
         var _padding = 10;
 
+        var _sunPosition = 'left';
         var _pixelSide;
         var _gap;
 
@@ -204,6 +205,10 @@
 
         this.setPixelGap = function(value) {
             _setPixelGap(value);
+        };
+
+        this.setSunPosition = function(value) {
+            _sunPosition = value;
         };
 
         this.renderHorizontal = function() {
@@ -274,9 +279,9 @@
                 if (color._a !== 0) {
                     var hslColor = color.getHSL();
                     palette = {
-                        top: color,
-                        left: hslColor.darken(30).getRGB(),
-                        right: hslColor.darken(60).getRGB(),
+                        normalSide: color,
+                        darkSide: hslColor.darken(30).getRGB(),
+                        darkestSide: hslColor.darken(60).getRGB(),
                         highlight: hslColor.lighten(30).getRGB(),
                         cornerHighlight: hslColor.lighten(80).getRGB(),
                         outline: hslColor.darken(90).getRGB()
@@ -295,19 +300,19 @@
                 return;
             }
 
-            _pixelDrawer.setColor(palette.left);
+            _pixelDrawer.setColor(_sunPosition === 'left' ? palette.darkSide : palette.darkestSide);
             for (var i = 1; i < _pixelHeight; i++) {
                 _pixelDrawer.moveTo(x, y + i - _pixelHeight);
                 _pixelDrawer.drawSlantedLineDown(_pixelSide);
             }
 
-            _pixelDrawer.setColor(palette.right);
+            _pixelDrawer.setColor(_sunPosition === 'left' ? palette.darkestSide : palette.darkSide);
             for (i = 1; i < _pixelHeight; i++) {
                 _pixelDrawer.moveTo(x + _pixelSide - 1, y + _offset - 1 + i - _pixelHeight);
                 _pixelDrawer.drawSlantedLineUp(_pixelSide);
             }
 
-            _pixelDrawer.setColor(palette.top);
+            _pixelDrawer.setColor(palette.normalSide);
             for (i = 1; i < _pixelSide - 1; i++) {
                 _pixelDrawer.moveTo(x + i * 2, y - _pixelHeight);
                 _pixelDrawer.drawSlantedLineUp(_pixelSide - i - 1);
