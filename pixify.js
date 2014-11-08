@@ -183,8 +183,11 @@
 
         var _padding = 10;
 
-        var _gap = this.setPixelGap(opts.pixelGap);
-        var _pixelSide = this.setPixelSize(opts.pixelSide);
+        var _pixelSide;
+        var _gap;
+
+        _setPixelSize(opts.pixelSide);
+        _setPixelGap(opts.pixelGap);
 
         var _pixelHeight = _pixelSide;
         var _pixelWidth = _pixelSide * 2 - 1;
@@ -195,12 +198,12 @@
 
         var _pixelDrawer;
 
-        this.setPixelSize = function (value) {
-            _pixelSide = value % 2 === 0 ? value : value - 1 || 32;
+        this.setPixelSize = function(value) {
+            _setPixelSize(value);
         };
 
-        this.setPixelGap = function (value) {
-            _gap = value % 2 === 0 ? value : value - 1 || 0;
+        this.setPixelGap = function(value) {
+            _setPixelGap(value);
         };
 
         this.renderHorizontal = function() {
@@ -243,6 +246,14 @@
             }
 
             _pixelDrawer.render();
+        };
+
+        function _setPixelSize(value) {
+            _pixelSide = value % 2 === 0 ? value : value - 1 || 32;
+        };
+
+        function _setPixelGap(value) {
+            _gap = value % 2 === 0 ? value : value - 1 || 0;
         };
 
         function setupSpriteCanvas(image) {
