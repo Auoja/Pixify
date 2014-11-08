@@ -184,16 +184,15 @@
         var _padding = 10;
 
         var _sunPosition = 'left';
-        var _pixelSide;
-        var _gap;
+        var _pixelSide = 32;
+        var _gap = 0;
+        var _pixelHeight;
+        var _pixelWidth;
+        var _offset;
+        var _distance;
 
         _setPixelSize(opts.pixelSide);
         _setPixelGap(opts.pixelGap);
-
-        var _pixelHeight = _pixelSide;
-        var _pixelWidth = _pixelSide * 2 - 1;
-        var _offset = _pixelSide / 2;
-        var _distance = _pixelSide + _gap;
 
         setupSpriteCanvas(opts.image);
 
@@ -255,10 +254,16 @@
 
         function _setPixelSize(value) {
             _pixelSide = value % 2 === 0 ? value : value - 1 || 32;
+            _pixelHeight = _pixelSide;
+            _pixelWidth = _pixelSide * 2 - 1;
+            _offset = _pixelSide / 2;
+            _distance = _pixelSide + _gap;
         };
 
         function _setPixelGap(value) {
             _gap = value % 2 === 0 ? value : value - 1 || 0;
+            _distance = _pixelSide + _gap;
+
         };
 
         function setupSpriteCanvas(image) {
