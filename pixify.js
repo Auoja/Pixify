@@ -183,8 +183,8 @@
 
         var _padding = 10;
 
-        var _gap = opts.pixelGap % 2 === 0 ? opts.pixelGap : opts.pixelGap - 1 || 0;
-        var _pixelSide = opts.pixelSide % 2 === 0 ? opts.pixelSide : opts.pixelSide - 1 || 32;
+        var _gap = this.setPixelGap(opts.pixelGap);
+        var _pixelSide = this.setPixelSize(opts.pixelSide);
 
         var _pixelHeight = _pixelSide;
         var _pixelWidth = _pixelSide * 2 - 1;
@@ -194,6 +194,14 @@
         setupSpriteCanvas(opts.image);
 
         var _pixelDrawer;
+
+        this.setPixelSize = function (value) {
+            _pixelSide = value % 2 === 0 ? value : value - 1 || 32;
+        };
+
+        this.setPixelGap = function (value) {
+            _gap = value % 2 === 0 ? value : value - 1 || 0;
+        };
 
         this.renderHorizontal = function() {
 
