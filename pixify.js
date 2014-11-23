@@ -172,10 +172,33 @@
         this._context.putImageData(this._imageData, 0, 0);
     };
 
+    function PaletteManager() {
+        this._colorLUT = {};
+    }
+
+    PaletteManager.prototype.getPalette = function(color) {
+        var hash = color.getHash();
+        if (!this._colorLUT[hash]) {
+            var palette = null;
+            if (color._a !== 0) {
+                var hslColor = color.getHSL();
+                palette = {
+                    'normalSide': color,
+                    'darkSide': hslColor.darken(30).getRGB(),
+                    'darkestSide': hslColor.darken(60).getRGB(),
+                    'highlight': hslColor.lighten(30).getRGB(),
+                    'cornerHighlight': hslColor.lighten(80).getRGB(),
+                    'outline': hslColor.darken(90).getRGB()
+                };
+            }
+            this._colorLUT[hash] = palette;
+        }
+        return this._colorLUT[hash];
+    };
+
     function Pixify(opts) {
         var _canvas = opts.canvas;
         var _ctx = _canvas.getContext('2d');
-        var _colorLUT = {};
         var _spriteCanvas;
         var _spriteCtx;
         var _xRes;
@@ -183,7 +206,12 @@
 
         var _padding = 10;
 
-        var _sunPosition = 'left';
+        var _palettLookUpPattern = {
+            topSide: 'normalSide',
+            leftSide: 'darkSide',
+            rightSide: 'darkestSide'
+        };
+
         var _pixelSide = 32;
         var _gap = 0;
         var _pixelHeight;
@@ -196,6 +224,8 @@
 
         setupSpriteCanvas(opts.image);
 
+        var _paletteManager = new PaletteManager();
+
         var _pixelDrawer;
 
         this.setPixelSize = function(value) {
@@ -207,11 +237,43 @@
         };
 
         this.setSunPosition = function(value) {
-            _sunPosition = value;
+            var sunPosition = value;
+
+            switch (sunPosition) {
+                case 'left':
+                    _palettLookUpPattern = {
+                        topSide: 'darkSide',
+                        leftSide: 'normalSide',
+                        rightSide: 'darkestSide'
+                    };
+                    break;
+                case 'right':
+                    _palettLookUpPattern = {
+                        topSide: 'darkSide',
+                        leftSide: 'darkestSide',
+                        rightSide: 'normalSide'
+                    };
+                    break;
+                case 'top-right':
+                    _palettLookUpPattern = {
+                        topSide: 'normalSide',
+                        leftSide: 'darkestSide',
+                        rightSide: 'darkSide'
+                    };
+                    break;
+                case 'top-left':
+                default:
+                    _palettLookUpPattern = {
+                        topSide: 'normalSide',
+                        leftSide: 'darkSide',
+                        rightSide: 'darkestSide'
+                    };
+            };
+
+            return _palettLookUpPattern;
         };
 
         this.renderHorizontal = function() {
-
             _canvas.width = 2 * _padding + _pixelSide * (_xRes + _yRes - 2) + _gap * (_xRes + _yRes - 2) + _pixelWidth;
             _canvas.height = 2 * _padding + _offset * (_xRes + _yRes) + (_gap / 2) * (_xRes + _yRes - 2) + _pixelHeight;
             _pixelDrawer = new PixelDrawer(_ctx, _canvas.width, _canvas.height);
@@ -232,7 +294,6 @@
         };
 
         this.renderVertical = function() {
-
             _canvas.width = 2 * _padding + _pixelSide * (_xRes - 1) + _gap * (_xRes - 1) + _pixelWidth;
             _canvas.height = 2 * _padding + _offset * (_xRes + 1) + (_gap / 2) * (_xRes - 1) + _pixelHeight * _yRes + (_gap) * (_yRes - 1) - 1; // Why -1
             _pixelDrawer = new PixelDrawer(_ctx, _canvas.width, _canvas.height);
@@ -258,13 +319,13 @@
             _pixelWidth = _pixelSide * 2 - 1;
             _offset = _pixelSide / 2;
             _distance = _pixelSide + _gap;
-        };
+        }
 
         function _setPixelGap(value) {
             _gap = value % 2 === 0 ? value : value - 1 || 0;
             _distance = _pixelSide + _gap;
 
-        };
+        }
 
         function setupSpriteCanvas(image) {
             _spriteCanvas = document.createElement('canvas');
@@ -277,47 +338,27 @@
             _spriteCtx.drawImage(image, 0, 0, _xRes, _yRes);
         }
 
-        function getColorPalette(color) {
-            var hash = color.getHash();
-            if (!_colorLUT[hash]) {
-                var palette = null;
-                if (color._a !== 0) {
-                    var hslColor = color.getHSL();
-                    palette = {
-                        normalSide: color,
-                        darkSide: hslColor.darken(30).getRGB(),
-                        darkestSide: hslColor.darken(60).getRGB(),
-                        highlight: hslColor.lighten(30).getRGB(),
-                        cornerHighlight: hslColor.lighten(80).getRGB(),
-                        outline: hslColor.darken(90).getRGB()
-                    };
-                }
-                _colorLUT[hash] = palette;
-            }
-            return _colorLUT[hash];
-        }
-
         function pixel2pixel(x, y, color) {
 
-            var palette = getColorPalette(color);
+            var palette = _paletteManager.getPalette(color);
 
             if (palette === null) {
                 return;
             }
 
-            _pixelDrawer.setColor(_sunPosition === 'left' ? palette.darkSide : palette.darkestSide);
+            _pixelDrawer.setColor(palette[_palettLookUpPattern['leftSide']]);
             for (var i = 1; i < _pixelHeight; i++) {
                 _pixelDrawer.moveTo(x, y + i - _pixelHeight);
                 _pixelDrawer.drawSlantedLineDown(_pixelSide);
             }
 
-            _pixelDrawer.setColor(_sunPosition === 'left' ? palette.darkestSide : palette.darkSide);
+            _pixelDrawer.setColor(palette[_palettLookUpPattern['rightSide']]);
             for (i = 1; i < _pixelHeight; i++) {
                 _pixelDrawer.moveTo(x + _pixelSide - 1, y + _offset - 1 + i - _pixelHeight);
                 _pixelDrawer.drawSlantedLineUp(_pixelSide);
             }
 
-            _pixelDrawer.setColor(palette.normalSide);
+            _pixelDrawer.setColor(palette[_palettLookUpPattern['topSide']]);
             for (i = 1; i < _pixelSide - 1; i++) {
                 _pixelDrawer.moveTo(x + i * 2, y - _pixelHeight);
                 _pixelDrawer.drawSlantedLineUp(_pixelSide - i - 1);
