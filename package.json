@@ -2,7 +2,7 @@
   "name": "pixify",
   "version": "1.0.0",
   "description": "A tool for making pixel art from pixel art",
-  "main": "pixify.js",
+  "main": "build/pixify.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,5 +15,11 @@
   "bugs": {
     "url": "https://github.com/Auoja/Pixify/issues"
   },
-  "homepage": "https://github.com/Auoja/Pixify"
+  "homepage": "https://github.com/Auoja/Pixify",
+  "devDependencies": {
+    "gulp": "~3.8.10",
+    "gulp-concat": "~2.4.2",
+    "gulp-jshint": "~1.9.0",
+    "browser-sync": "~1.7.1"
+  }
 }
