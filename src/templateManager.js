@@ -25,37 +25,37 @@ var TemplateManager = (function() {
 
     TemplateManager.prototype.colorizeTemplate = function(palette) {
         var colorized = [];
-        var hash = palette.normalSide.getHash();
+        var baseColor = palette.normalSide;
 
-        if (!this._templateLUT[hash]) {
+        if (!this._templateLUT[baseColor]) {
             for (var i = 0; i < this._template.getTemplate().length; i++) {
                 switch (this._template.getTemplate()[i]) {
-                    case "left":
+                    case Pix.LEFT:
                         colorized[i] = palette[this._paletteLookUpPattern.leftSide];
                         break;
-                    case "right":
+                    case Pix.RIGHT:
                         colorized[i] = palette[this._paletteLookUpPattern.rightSide];
                         break;
-                    case "top":
+                    case Pix.TOP:
                         colorized[i] = palette[this._paletteLookUpPattern.topSide];
                         break;
-                    case "outline":
+                    case Pix.OUTLINE:
                         colorized[i] = palette.outline;
                         break;
-                    case "highlight":
+                    case Pix.HIGHLIGHT:
                         colorized[i] = palette.highlight;
                         break;
-                    case "cornerhighlight":
+                    case Pix.CORNERHIGHLIGHT:
                         colorized[i] = palette.cornerHighlight;
                         break;
-                    case "nothing":
+                    case Pix.TRANSPARENT:
                         colorized[i] = this._transparentColor;
                 }
             }
-            this._templateLUT[hash] = colorized;
+            this._templateLUT[baseColor] = colorized;
         }
 
-        return this._templateLUT[hash];
+        return this._templateLUT[baseColor];
     };
 
     return TemplateManager;

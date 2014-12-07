@@ -8,6 +8,7 @@ var scriptPaths = './src/*.js';
 
 gulp.task('browser-sync', function() {
     browserSync({
+        open: false,
         server: {
             baseDir: "./"
         }
@@ -22,6 +23,6 @@ gulp.task('build', function() {
         .pipe(gulp.dest('./'));
 });
 
-gulp.task('default', ['browser-sync'], function() {
+gulp.task('default', ['build', 'browser-sync'], function() {
     gulp.watch(scriptPaths, ['build', browserSync.reload]);
 });

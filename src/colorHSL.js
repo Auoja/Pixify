@@ -1,18 +1,18 @@
 var ColorHSL = (function() {
 
     function ColorHSL(h, s, l, a) {
-        this._h = h || 0;
-        this._s = s || 0;
-        this._l = l || 0;
-        this._a = a || 1;
+        this.h = h;
+        this.s = s;
+        this.l = l;
+        this.a = a;
     }
 
     ColorHSL.prototype.darken = function(amount) {
-        return new ColorHSL(this._h, this._s, this._l * (1 - (amount) / 100), 1);
+        return new ColorHSL(this.h, this.s, this.l * (1 - (amount) / 100), 1);
     };
 
     ColorHSL.prototype.lighten = function(amount) {
-        return new ColorHSL(this._h, this._s, this._l * (1 + (amount) / 100), 1);
+        return new ColorHSL(this.h, this.s, this.l * (1 + (amount) / 100), 1);
     };
 
     ColorHSL.prototype.getRGB = function() {
@@ -39,14 +39,14 @@ var ColorHSL = (function() {
             return p;
         }
 
-        if (this._s === 0) {
-            r = g = b = this._l; // achromatic
+        if (this.s === 0) {
+            r = g = b = this.l; // achromatic
         } else {
-            var q = this._l < 0.5 ? this._l * (1 + this._s) : this._l + this._s - this._l * this._s;
-            var p = 2 * this._l - q;
-            r = hue2rgb(p, q, this._h + 1 / 3);
-            g = hue2rgb(p, q, this._h);
-            b = hue2rgb(p, q, this._h - 1 / 3);
+            var q = this.l < 0.5 ? this.l * (1 + this.s) : this.l + this.s - this.l * this.s;
+            var p = 2 * this.l - q;
+            r = hue2rgb(p, q, this.h + 1 / 3);
+            g = hue2rgb(p, q, this.h);
+            b = hue2rgb(p, q, this.h - 1 / 3);
         }
 
         return new ColorRGB(r, g, b, 1);

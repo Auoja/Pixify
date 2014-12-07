@@ -1,18 +1,18 @@
 var ColorHSL = (function() {
 
     function ColorHSL(h, s, l, a) {
-        this._h = h || 0;
-        this._s = s || 0;
-        this._l = l || 0;
-        this._a = a || 1;
+        this.h = h;
+        this.s = s;
+        this.l = l;
+        this.a = a;
     }
 
     ColorHSL.prototype.darken = function(amount) {
-        return new ColorHSL(this._h, this._s, this._l * (1 - (amount) / 100), 1);
+        return new ColorHSL(this.h, this.s, this.l * (1 - (amount) / 100), 1);
     };
 
     ColorHSL.prototype.lighten = function(amount) {
-        return new ColorHSL(this._h, this._s, this._l * (1 + (amount) / 100), 1);
+        return new ColorHSL(this.h, this.s, this.l * (1 + (amount) / 100), 1);
     };
 
     ColorHSL.prototype.getRGB = function() {
@@ -39,14 +39,14 @@ var ColorHSL = (function() {
             return p;
         }
 
-        if (this._s === 0) {
-            r = g = b = this._l; // achromatic
+        if (this.s === 0) {
+            r = g = b = this.l; // achromatic
         } else {
-            var q = this._l < 0.5 ? this._l * (1 + this._s) : this._l + this._s - this._l * this._s;
-            var p = 2 * this._l - q;
-            r = hue2rgb(p, q, this._h + 1 / 3);
-            g = hue2rgb(p, q, this._h);
-            b = hue2rgb(p, q, this._h - 1 / 3);
+            var q = this.l < 0.5 ? this.l * (1 + this.s) : this.l + this.s - this.l * this.s;
+            var p = 2 * this.l - q;
+            r = hue2rgb(p, q, this.h + 1 / 3);
+            g = hue2rgb(p, q, this.h);
+            b = hue2rgb(p, q, this.h - 1 / 3);
         }
 
         return new ColorRGB(r, g, b, 1);
@@ -58,15 +58,15 @@ var ColorHSL = (function() {
 var ColorRGB = (function() {
 
     function ColorRGB(r, g, b, a) {
-        this._r = r;
-        this._g = g;
-        this._b = b;
-        this._a = a;
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
     }
 
     ColorRGB.prototype.getHSL = function() {
-        var max = Math.max(this._r, this._g, this._b);
-        var min = Math.min(this._r, this._g, this._b);
+        var max = Math.max(this.r, this.g, this.b);
+        var min = Math.min(this.r, this.g, this.b);
         var h;
         var s;
         var l = (max + min) / 2;
@@ -77,14 +77,14 @@ var ColorRGB = (function() {
             var d = max - min;
             s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
             switch (max) {
-                case this._r:
-                    h = (this._g - this._b) / d + (this._g < this._b ? 6 : 0);
+                case this.r:
+                    h = (this.g - this.b) / d + (this.g < this.b ? 6 : 0);
                     break;
-                case this._g:
-                    h = (this._b - this._r) / d + 2;
+                case this.g:
+                    h = (this.b - this.r) / d + 2;
                     break;
-                case this._b:
-                    h = (this._r - this._g) / d + 4;
+                case this.b:
+                    h = (this.r - this.g) / d + 4;
                     break;
             }
             h /= 6;
@@ -94,8 +94,8 @@ var ColorRGB = (function() {
 
     };
 
-    ColorRGB.prototype.getHash = function() {
-        return this._r + "-" + this._g + "-" + this._b + "-" + this._a;
+    ColorRGB.prototype.toString = function() {
+        return this.r + "-" + this.g + "-" + this.b + "-" + this.a;
     };
 
     return ColorRGB;
@@ -113,10 +113,10 @@ var PaletteManager = (function() {
 
         // Private
         function _getPalette(color) {
-            var hash = color.getHash();
-            if (!_colorLUT[hash]) {
-                var palette = null;
-                if (color._a !== 0) {
+            var palette = null;
+
+            if (!_colorLUT[color]) {
+                if (color.a !== 0) {
                     var hslColor = color.getHSL();
                     palette = {
                         'normalSide': color,
@@ -127,9 +127,9 @@ var PaletteManager = (function() {
                         'outline': hslColor.darken(90).getRGB()
                     };
                 }
-                _colorLUT[hash] = palette;
+                _colorLUT[color] = palette;
             }
-            return _colorLUT[hash];
+            return _colorLUT[color];
         }
 
         // Public
@@ -146,33 +146,27 @@ var PaletteManager = (function() {
         };
 
         this.getTopColor = function(color) {
-            var palette = _getPalette(color);
-            return palette[_paletteLookUpPattern.topSide];
+            return _getPalette(color)[_paletteLookUpPattern.topSide];
         };
 
         this.getLeftColor = function(color) {
-            var palette = _getPalette(color);
-            return palette[_paletteLookUpPattern.leftSide];
+            return _getPalette(color)[_paletteLookUpPattern.leftSide];
         };
 
         this.getRightColor = function(color) {
-            var palette = _getPalette(color);
-            return palette[_paletteLookUpPattern.rightSide];
+            return _getPalette(color)[_paletteLookUpPattern.rightSide];
         };
 
         this.getOutlineColor = function(color) {
-            var palette = _getPalette(color);
-            return palette.outline;
+            return _getPalette(color).outline;
         };
 
         this.getHightLightColor = function(color) {
-            var palette = _getPalette(color);
-            return palette.highlight;
+            return _getPalette(color).highlight;
         };
 
         this.getCornerHightlightColor = function(color) {
-            var palette = _getPalette(color);
-            return palette.cornerHighlight;
+            return _getPalette(color).cornerHighlight;
         };
 
         this.getPalette = function(color) {
@@ -217,6 +211,19 @@ var PaletteManager = (function() {
     return PaletteManager;
 
 })();
+var Pix = (function() {
+
+    return {
+        CORNERHIGHLIGHT: 0,
+        LEFT: 1,
+        RIGHT: 2,
+        TOP: 3,
+        OUTLINE: 4,
+        HIGHLIGHT: 5,
+        TRANSPARENT: 6
+    };
+
+})();
 var PixelDrawer = (function() {
 
     function PixelDrawer(context, width, height) {
@@ -231,12 +238,12 @@ var PixelDrawer = (function() {
     };
 
     PixelDrawer.prototype.setPixel = function(x, y, color) {
-        if (x >= 0 && x < this._width && y >= 0 && y < this._height && color._a !== 0) {
+        if (x >= 0 && x < this._width && y >= 0 && y < this._height && color.a !== 0) {
             var index = (x + y * this._imageData.width) * 4;
-            this._imageData.data[index + 0] = Math.round(color._r * 255);
-            this._imageData.data[index + 1] = Math.round(color._g * 255);
-            this._imageData.data[index + 2] = Math.round(color._b * 255);
-            this._imageData.data[index + 3] = Math.round(color._a * 255);
+            this._imageData.data[index + 0] = Math.round(color.r * 255);
+            this._imageData.data[index + 1] = Math.round(color.g * 255);
+            this._imageData.data[index + 2] = Math.round(color.b * 255);
+            this._imageData.data[index + 3] = Math.round(color.a * 255);
         }
     };
 
@@ -250,25 +257,25 @@ var PixelDrawer = (function() {
 var PixelTemplate = (function() {
 
     function PixelTemplate(width, height) {
-        this._template = [];
+        this._pixelTemplate = [];
         this._width = width;
         this._height = height;
         this._xPos = 0;
         this._yPos = 0;
-        this._value = "nothing";
+        this._value = Pix.TRANSPARENT;
 
         var length = width * height;
         for (var i = 0; i < length; i++) {
-            this._template.push(this._value);
+            this._pixelTemplate.push(this._value);
         }
     }
 
     PixelTemplate.prototype.getTemplate = function() {
-        return this._template;
+        return this._pixelTemplate;
     };
 
     PixelTemplate.prototype.flush = function() {
-        this._template = [];
+        this._pixelTemplate = [];
         this._xPos = 0;
         this._yPos = 0;
         this._value = {};
@@ -289,7 +296,7 @@ var PixelTemplate = (function() {
     };
 
     PixelTemplate.prototype.setPixel = function(x, y, value) {
-        this._template[this._width * y + x] = value;
+        this._pixelTemplate[this._width * y + x] = value;
     };
 
     PixelTemplate.prototype.drawSlantedLineUp = function(distance) {
@@ -438,19 +445,19 @@ window.Pixify = (function() {
             var x = 0;
             var y = _pixelSide + _offset;
 
-            _pixelTemplate.setValue("left");
+            _pixelTemplate.setValue(Pix.LEFT);
             for (var i = 1; i < _pixelHeight; i++) {
                 _pixelTemplate.moveTo(x, y + i - _pixelHeight);
                 _pixelTemplate.drawSlantedLineDown(_pixelSide);
             }
 
-            _pixelTemplate.setValue("right");
+            _pixelTemplate.setValue(Pix.RIGHT);
             for (i = 1; i < _pixelHeight; i++) {
                 _pixelTemplate.moveTo(x + _pixelSide - 1, y + _offset - 1 + i - _pixelHeight);
                 _pixelTemplate.drawSlantedLineUp(_pixelSide);
             }
 
-            _pixelTemplate.setValue("top");
+            _pixelTemplate.setValue(Pix.TOP);
             for (i = 1; i < _pixelSide - 1; i++) {
                 _pixelTemplate.moveTo(x + i * 2, y - _pixelHeight);
                 _pixelTemplate.drawSlantedLineUp(_pixelSide - i - 1);
@@ -458,7 +465,7 @@ window.Pixify = (function() {
                 _pixelTemplate.drawSlantedLineDown(_pixelSide - i - 1);
             }
 
-            _pixelTemplate.setValue("outline");
+            _pixelTemplate.setValue(Pix.OUTLINE);
 
             _pixelTemplate.moveTo(x, y);
             _pixelTemplate.drawSlantedLineDown(_pixelSide);
@@ -476,7 +483,7 @@ window.Pixify = (function() {
             _pixelTemplate.moveRelativeTo(-1, 1);
             _pixelTemplate.drawSlantedLineDown(_pixelSide);
 
-            _pixelTemplate.setValue("highlight");
+            _pixelTemplate.setValue(Pix.HIGHLIGHT);
 
             _pixelTemplate.moveTo(x + 2, y - _pixelHeight + 1);
             _pixelTemplate.drawSlantedLineDown(_pixelSide - 2);
@@ -485,7 +492,7 @@ window.Pixify = (function() {
             _pixelTemplate.moveTo(x + _pixelSide - 1, y + _offset - 1 - _pixelHeight);
             _pixelTemplate.drawVerticalLine(_pixelHeight);
 
-            _pixelTemplate.setValue("cornerhighlight");
+            _pixelTemplate.setValue(Pix.CORNERHIGHLIGHT);
 
             _pixelTemplate.moveTo(x + _pixelSide - 1, y + _offset - 1 - _pixelHeight);
             _pixelTemplate.drawVerticalLine(3);
@@ -578,37 +585,37 @@ var TemplateManager = (function() {
 
     TemplateManager.prototype.colorizeTemplate = function(palette) {
         var colorized = [];
-        var hash = palette.normalSide.getHash();
+        var baseColor = palette.normalSide;
 
-        if (!this._templateLUT[hash]) {
+        if (!this._templateLUT[baseColor]) {
             for (var i = 0; i < this._template.getTemplate().length; i++) {
                 switch (this._template.getTemplate()[i]) {
-                    case "left":
+                    case Pix.LEFT:
                         colorized[i] = palette[this._paletteLookUpPattern.leftSide];
                         break;
-                    case "right":
+                    case Pix.RIGHT:
                         colorized[i] = palette[this._paletteLookUpPattern.rightSide];
                         break;
-                    case "top":
+                    case Pix.TOP:
                         colorized[i] = palette[this._paletteLookUpPattern.topSide];
                         break;
-                    case "outline":
+                    case Pix.OUTLINE:
                         colorized[i] = palette.outline;
                         break;
-                    case "highlight":
+                    case Pix.HIGHLIGHT:
                         colorized[i] = palette.highlight;
                         break;
-                    case "cornerhighlight":
+                    case Pix.CORNERHIGHLIGHT:
                         colorized[i] = palette.cornerHighlight;
                         break;
-                    case "nothing":
+                    case Pix.TRANSPARENT:
                         colorized[i] = this._transparentColor;
                 }
             }
-            this._templateLUT[hash] = colorized;
+            this._templateLUT[baseColor] = colorized;
         }
 
-        return this._templateLUT[hash];
+        return this._templateLUT[baseColor];
     };
 
     return TemplateManager;

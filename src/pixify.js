@@ -105,19 +105,19 @@ window.Pixify = (function() {
             var x = 0;
             var y = _pixelSide + _offset;
 
-            _pixelTemplate.setValue("left");
+            _pixelTemplate.setValue(Pix.LEFT);
             for (var i = 1; i < _pixelHeight; i++) {
                 _pixelTemplate.moveTo(x, y + i - _pixelHeight);
                 _pixelTemplate.drawSlantedLineDown(_pixelSide);
             }
 
-            _pixelTemplate.setValue("right");
+            _pixelTemplate.setValue(Pix.RIGHT);
             for (i = 1; i < _pixelHeight; i++) {
                 _pixelTemplate.moveTo(x + _pixelSide - 1, y + _offset - 1 + i - _pixelHeight);
                 _pixelTemplate.drawSlantedLineUp(_pixelSide);
             }
 
-            _pixelTemplate.setValue("top");
+            _pixelTemplate.setValue(Pix.TOP);
             for (i = 1; i < _pixelSide - 1; i++) {
                 _pixelTemplate.moveTo(x + i * 2, y - _pixelHeight);
                 _pixelTemplate.drawSlantedLineUp(_pixelSide - i - 1);
@@ -125,7 +125,7 @@ window.Pixify = (function() {
                 _pixelTemplate.drawSlantedLineDown(_pixelSide - i - 1);
             }
 
-            _pixelTemplate.setValue("outline");
+            _pixelTemplate.setValue(Pix.OUTLINE);
 
             _pixelTemplate.moveTo(x, y);
             _pixelTemplate.drawSlantedLineDown(_pixelSide);
@@ -143,7 +143,7 @@ window.Pixify = (function() {
             _pixelTemplate.moveRelativeTo(-1, 1);
             _pixelTemplate.drawSlantedLineDown(_pixelSide);
 
-            _pixelTemplate.setValue("highlight");
+            _pixelTemplate.setValue(Pix.HIGHLIGHT);
 
             _pixelTemplate.moveTo(x + 2, y - _pixelHeight + 1);
             _pixelTemplate.drawSlantedLineDown(_pixelSide - 2);
@@ -152,7 +152,7 @@ window.Pixify = (function() {
             _pixelTemplate.moveTo(x + _pixelSide - 1, y + _offset - 1 - _pixelHeight);
             _pixelTemplate.drawVerticalLine(_pixelHeight);
 
-            _pixelTemplate.setValue("cornerhighlight");
+            _pixelTemplate.setValue(Pix.CORNERHIGHLIGHT);
 
             _pixelTemplate.moveTo(x + _pixelSide - 1, y + _offset - 1 - _pixelHeight);
             _pixelTemplate.drawVerticalLine(3);

@@ -1,15 +1,15 @@
 var ColorRGB = (function() {
 
     function ColorRGB(r, g, b, a) {
-        this._r = r;
-        this._g = g;
-        this._b = b;
-        this._a = a;
+        this.r = r;
+        this.g = g;
+        this.b = b;
+        this.a = a;
     }
 
     ColorRGB.prototype.getHSL = function() {
-        var max = Math.max(this._r, this._g, this._b);
-        var min = Math.min(this._r, this._g, this._b);
+        var max = Math.max(this.r, this.g, this.b);
+        var min = Math.min(this.r, this.g, this.b);
         var h;
         var s;
         var l = (max + min) / 2;
@@ -20,14 +20,14 @@ var ColorRGB = (function() {
             var d = max - min;
             s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
             switch (max) {
-                case this._r:
-                    h = (this._g - this._b) / d + (this._g < this._b ? 6 : 0);
+                case this.r:
+                    h = (this.g - this.b) / d + (this.g < this.b ? 6 : 0);
                     break;
-                case this._g:
-                    h = (this._b - this._r) / d + 2;
+                case this.g:
+                    h = (this.b - this.r) / d + 2;
                     break;
-                case this._b:
-                    h = (this._r - this._g) / d + 4;
+                case this.b:
+                    h = (this.r - this.g) / d + 4;
                     break;
             }
             h /= 6;
@@ -37,8 +37,8 @@ var ColorRGB = (function() {
 
     };
 
-    ColorRGB.prototype.getHash = function() {
-        return this._r + "-" + this._g + "-" + this._b + "-" + this._a;
+    ColorRGB.prototype.toString = function() {
+        return this.r + "-" + this.g + "-" + this.b + "-" + this.a;
     };
 
     return ColorRGB;

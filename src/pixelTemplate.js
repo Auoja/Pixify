@@ -1,25 +1,25 @@
 var PixelTemplate = (function() {
 
     function PixelTemplate(width, height) {
-        this._template = [];
+        this._pixelTemplate = [];
         this._width = width;
         this._height = height;
         this._xPos = 0;
         this._yPos = 0;
-        this._value = "nothing";
+        this._value = Pix.TRANSPARENT;
 
         var length = width * height;
         for (var i = 0; i < length; i++) {
-            this._template.push(this._value);
+            this._pixelTemplate.push(this._value);
         }
     }
 
     PixelTemplate.prototype.getTemplate = function() {
-        return this._template;
+        return this._pixelTemplate;
     };
 
     PixelTemplate.prototype.flush = function() {
-        this._template = [];
+        this._pixelTemplate = [];
         this._xPos = 0;
         this._yPos = 0;
         this._value = {};
@@ -40,7 +40,7 @@ var PixelTemplate = (function() {
     };
 
     PixelTemplate.prototype.setPixel = function(x, y, value) {
-        this._template[this._width * y + x] = value;
+        this._pixelTemplate[this._width * y + x] = value;
     };
 
     PixelTemplate.prototype.drawSlantedLineUp = function(distance) {

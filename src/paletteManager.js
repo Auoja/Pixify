@@ -10,10 +10,10 @@ var PaletteManager = (function() {
 
         // Private
         function _getPalette(color) {
-            var hash = color.getHash();
-            if (!_colorLUT[hash]) {
-                var palette = null;
-                if (color._a !== 0) {
+            var palette = null;
+
+            if (!_colorLUT[color]) {
+                if (color.a !== 0) {
                     var hslColor = color.getHSL();
                     palette = {
                         'normalSide': color,
@@ -24,9 +24,9 @@ var PaletteManager = (function() {
                         'outline': hslColor.darken(90).getRGB()
                     };
                 }
-                _colorLUT[hash] = palette;
+                _colorLUT[color] = palette;
             }
-            return _colorLUT[hash];
+            return _colorLUT[color];
         }
 
         // Public
@@ -43,33 +43,27 @@ var PaletteManager = (function() {
         };
 
         this.getTopColor = function(color) {
-            var palette = _getPalette(color);
-            return palette[_paletteLookUpPattern.topSide];
+            return _getPalette(color)[_paletteLookUpPattern.topSide];
         };
 
         this.getLeftColor = function(color) {
-            var palette = _getPalette(color);
-            return palette[_paletteLookUpPattern.leftSide];
+            return _getPalette(color)[_paletteLookUpPattern.leftSide];
         };
 
         this.getRightColor = function(color) {
-            var palette = _getPalette(color);
-            return palette[_paletteLookUpPattern.rightSide];
+            return _getPalette(color)[_paletteLookUpPattern.rightSide];
         };
 
         this.getOutlineColor = function(color) {
-            var palette = _getPalette(color);
-            return palette.outline;
+            return _getPalette(color).outline;
         };
 
         this.getHightLightColor = function(color) {
-            var palette = _getPalette(color);
-            return palette.highlight;
+            return _getPalette(color).highlight;
         };
 
         this.getCornerHightlightColor = function(color) {
-            var palette = _getPalette(color);
-            return palette.cornerHighlight;
+            return _getPalette(color).cornerHighlight;
         };
 
         this.getPalette = function(color) {
