@@ -2,11 +2,29 @@ var PaletteManager = (function() {
 
     function PaletteManager() {
         var _colorLUT = {};
-        var _paletteLookUpPattern = {
+        var _paletteLookUpPatterns = [{
+            // Left
+            topSide: 'darkSide',
+            leftSide: 'normalSide',
+            rightSide: 'darkestSide'
+        }, {
+            // Right
+            topSide: 'darkSide',
+            leftSide: 'darkestSide',
+            rightSide: 'normalSide'
+        }, {
+            // Top Right
+            topSide: 'normalSide',
+            leftSide: 'darkestSide',
+            rightSide: 'darkSide'
+        }, {
+            // Top Left
             topSide: 'normalSide',
             leftSide: 'darkSide',
             rightSide: 'darkestSide'
-        };
+        }];
+
+        var _paletteLookUpPattern = _paletteLookUpPatterns[Pix.SUN_TOP_LEFT];
 
         // Private
         function _getPalette(color) {
@@ -71,35 +89,8 @@ var PaletteManager = (function() {
         };
 
         this.setSunPosition = function(position) {
-            switch (position) {
-                case 'left':
-                    _paletteLookUpPattern = {
-                        topSide: 'darkSide',
-                        leftSide: 'normalSide',
-                        rightSide: 'darkestSide'
-                    };
-                    break;
-                case 'right':
-                    _paletteLookUpPattern = {
-                        topSide: 'darkSide',
-                        leftSide: 'darkestSide',
-                        rightSide: 'normalSide'
-                    };
-                    break;
-                case 'top-right':
-                    _paletteLookUpPattern = {
-                        topSide: 'normalSide',
-                        leftSide: 'darkestSide',
-                        rightSide: 'darkSide'
-                    };
-                    break;
-                default:
-                case 'top-left':
-                    _paletteLookUpPattern = {
-                        topSide: 'normalSide',
-                        leftSide: 'darkSide',
-                        rightSide: 'darkestSide'
-                    };
+            if (_paletteLookUpPatterns[position]) {
+                _paletteLookUpPattern = _paletteLookUpPatterns[position];
             }
         };
 
