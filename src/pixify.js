@@ -19,7 +19,8 @@ window.Pixify = (function() {
         var _sprite = new Sprite(opts.image);
 
         var _paletteManager = new PaletteManager();
-        var _templateManager = new TemplateManager();
+
+        var _pixelTemplate;
 
         var _pixelDrawer;
 
@@ -33,7 +34,6 @@ window.Pixify = (function() {
 
         this.setSunPosition = function(position) {
             _paletteManager.setSunPosition(position);
-            _templateManager.setPaletteLookUpPattern(_paletteManager.getPattern());
         };
 
         this.renderHorizontal = function() {
@@ -50,7 +50,8 @@ window.Pixify = (function() {
                 y: _padding + (xRes - 1) * _offset + (_gap / 2) * (xRes - 1) - 1
             };
 
-            _templateManager.setTemplate(createTemplate());
+            _pixelTemplate = createTemplate();
+            _pixelTemplate.setPaletteLookUpPattern(_paletteManager.getPattern());
 
             for (var y = 0; y < yRes; y++) {
                 for (var x = xRes - 1; x >= 0; x--) {
@@ -75,7 +76,8 @@ window.Pixify = (function() {
                 y: _padding + (xRes - 1) * _offset + (_gap / 2) * (xRes - 1) - 1
             };
 
-            _templateManager.setTemplate(createTemplate());
+            _pixelTemplate = createTemplate();
+            _pixelTemplate.setPaletteLookUpPattern(_paletteManager.getPattern());
 
             for (var y = yRes - 1; y >= 0; y--) {
                 for (var x = xRes - 1; x >= 0; x--) {
@@ -100,81 +102,78 @@ window.Pixify = (function() {
         }
 
         function createTemplate() {
-            var _pixelTemplate = new PixelTemplate(_pixelWidth, _pixelHeight + _pixelSide);
+            var pixelTemplate = new PixelTemplate(_pixelWidth, _pixelHeight + _pixelSide);
 
             var x = 0;
             var y = _pixelSide + _offset;
 
-            _pixelTemplate.setValue(Pix.LEFT);
+            pixelTemplate.setValue(Pix.LEFT);
             for (var i = 1; i < _pixelHeight; i++) {
-                _pixelTemplate.moveTo(x, y + i - _pixelHeight);
-                _pixelTemplate.drawSlantedLineDown(_pixelSide);
+                pixelTemplate.moveTo(x, y + i - _pixelHeight);
+                pixelTemplate.drawSlantedLineDown(_pixelSide);
             }
 
-            _pixelTemplate.setValue(Pix.RIGHT);
+            pixelTemplate.setValue(Pix.RIGHT);
             for (i = 1; i < _pixelHeight; i++) {
-                _pixelTemplate.moveTo(x + _pixelSide - 1, y + _offset - 1 + i - _pixelHeight);
-                _pixelTemplate.drawSlantedLineUp(_pixelSide);
+                pixelTemplate.moveTo(x + _pixelSide - 1, y + _offset - 1 + i - _pixelHeight);
+                pixelTemplate.drawSlantedLineUp(_pixelSide);
             }
 
-            _pixelTemplate.setValue(Pix.TOP);
+            pixelTemplate.setValue(Pix.TOP);
             for (i = 1; i < _pixelSide - 1; i++) {
-                _pixelTemplate.moveTo(x + i * 2, y - _pixelHeight);
-                _pixelTemplate.drawSlantedLineUp(_pixelSide - i - 1);
-                _pixelTemplate.moveTo(x + i * 2, y - _pixelHeight);
-                _pixelTemplate.drawSlantedLineDown(_pixelSide - i - 1);
+                pixelTemplate.moveTo(x + i * 2, y - _pixelHeight);
+                pixelTemplate.drawSlantedLineUp(_pixelSide - i - 1);
+                pixelTemplate.moveTo(x + i * 2, y - _pixelHeight);
+                pixelTemplate.drawSlantedLineDown(_pixelSide - i - 1);
             }
 
-            _pixelTemplate.setValue(Pix.OUTLINE);
+            pixelTemplate.setValue(Pix.OUTLINE);
 
-            _pixelTemplate.moveTo(x, y);
-            _pixelTemplate.drawSlantedLineDown(_pixelSide);
-            _pixelTemplate.moveRelativeTo(-1, -1);
-            _pixelTemplate.drawSlantedLineUp(_pixelSide);
+            pixelTemplate.moveTo(x, y);
+            pixelTemplate.drawSlantedLineDown(_pixelSide);
+            pixelTemplate.moveRelativeTo(-1, -1);
+            pixelTemplate.drawSlantedLineUp(_pixelSide);
 
-            _pixelTemplate.moveTo(x, y - _pixelHeight);
-            _pixelTemplate.drawVerticalLine(_pixelHeight);
+            pixelTemplate.moveTo(x, y - _pixelHeight);
+            pixelTemplate.drawVerticalLine(_pixelHeight);
 
-            _pixelTemplate.moveTo(x + _pixelWidth - 1, y - _pixelHeight);
-            _pixelTemplate.drawVerticalLine(_pixelHeight);
+            pixelTemplate.moveTo(x + _pixelWidth - 1, y - _pixelHeight);
+            pixelTemplate.drawVerticalLine(_pixelHeight);
 
-            _pixelTemplate.moveTo(x, y - _pixelHeight);
-            _pixelTemplate.drawSlantedLineUp(_pixelSide);
-            _pixelTemplate.moveRelativeTo(-1, 1);
-            _pixelTemplate.drawSlantedLineDown(_pixelSide);
+            pixelTemplate.moveTo(x, y - _pixelHeight);
+            pixelTemplate.drawSlantedLineUp(_pixelSide);
+            pixelTemplate.moveRelativeTo(-1, 1);
+            pixelTemplate.drawSlantedLineDown(_pixelSide);
 
-            _pixelTemplate.setValue(Pix.HIGHLIGHT);
+            pixelTemplate.setValue(Pix.HIGHLIGHT);
 
-            _pixelTemplate.moveTo(x + 2, y - _pixelHeight + 1);
-            _pixelTemplate.drawSlantedLineDown(_pixelSide - 2);
-            _pixelTemplate.moveRelativeTo(-1, -1);
-            _pixelTemplate.drawSlantedLineUp(_pixelSide - 2);
-            _pixelTemplate.moveTo(x + _pixelSide - 1, y + _offset - 1 - _pixelHeight);
-            _pixelTemplate.drawVerticalLine(_pixelHeight);
+            pixelTemplate.moveTo(x + 2, y - _pixelHeight + 1);
+            pixelTemplate.drawSlantedLineDown(_pixelSide - 2);
+            pixelTemplate.moveRelativeTo(-1, -1);
+            pixelTemplate.drawSlantedLineUp(_pixelSide - 2);
+            pixelTemplate.moveTo(x + _pixelSide - 1, y + _offset - 1 - _pixelHeight);
+            pixelTemplate.drawVerticalLine(_pixelHeight);
 
-            _pixelTemplate.setValue(Pix.CORNERHIGHLIGHT);
+            pixelTemplate.setValue(Pix.CORNERHIGHLIGHT);
 
-            _pixelTemplate.moveTo(x + _pixelSide - 1, y + _offset - 1 - _pixelHeight);
-            _pixelTemplate.drawVerticalLine(3);
-            _pixelTemplate.moveTo(x + _pixelSide - 2, y + _offset - 1 - _pixelHeight);
-            _pixelTemplate.drawHorizontalLine(3);
+            pixelTemplate.moveTo(x + _pixelSide - 1, y + _offset - 1 - _pixelHeight);
+            pixelTemplate.drawVerticalLine(3);
+            pixelTemplate.moveTo(x + _pixelSide - 2, y + _offset - 1 - _pixelHeight);
+            pixelTemplate.drawHorizontalLine(3);
 
-            return _pixelTemplate;
+            return pixelTemplate;
         }
 
         function template2pixel(originX, originY, color) {
-
-            var pixel = [];
-
             if (!_paletteManager.isColorValid(color)) {
                 return;
             }
 
-            pixel = _templateManager.colorizeTemplate(_paletteManager.getPalette(color));
+            var pixel = _pixelTemplate.getColorizedTemplate(_paletteManager.getPalette(color));
 
-            for (var x = 0; x < _templateManager.getTemplate()._width; x++) {
-                for (var y = 0; y < _templateManager.getTemplate()._height; y++) {
-                    var tempColor = pixel[_templateManager.getTemplate()._width * y + x];
+            for (var x = 0; x < _pixelTemplate.getWidth(); x++) {
+                for (var y = 0; y < _pixelTemplate.getHeight(); y++) {
+                    var tempColor = pixel[_pixelTemplate.getWidth() * y + x];
                     if (tempColor) {
                         _pixelDrawer.setPixel(originX + x, originY + y, tempColor);
                     }
