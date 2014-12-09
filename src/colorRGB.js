@@ -1,5 +1,16 @@
 var ColorRGB = (function() {
 
+    /**
+     * An RGB color object.
+     *
+     * @class ColorRGB
+     * @constructor
+     *
+     * @param {Number} r Red
+     * @param {Number} g Green
+     * @param {Number} b Blue
+     * @param {Number} a Alpha
+     */
     function ColorRGB(r, g, b, a) {
         this.r = r;
         this.g = g;
@@ -7,6 +18,12 @@ var ColorRGB = (function() {
         this.a = a;
     }
 
+    /**
+     * Create a `ColorHSL` version of the `ColorRGB`
+     *
+     * @method getHSL
+     * @return {ColorHSL} The HSL color representation.
+     */
     ColorRGB.prototype.getHSL = function() {
         var max = Math.max(this.r, this.g, this.b);
         var min = Math.min(this.r, this.g, this.b);
@@ -15,7 +32,7 @@ var ColorRGB = (function() {
         var l = (max + min) / 2;
 
         if (max === min) {
-            h = s = 0; // achromatic
+            h = s = 0;
         } else {
             var d = max - min;
             s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -37,6 +54,11 @@ var ColorRGB = (function() {
 
     };
 
+    /**
+     * Get string representation of `ColorRGB`.
+     * @method toString
+     * @return {String} The string representation.
+     */
     ColorRGB.prototype.toString = function() {
         return this.r + "-" + this.g + "-" + this.b + "-" + this.a;
     };

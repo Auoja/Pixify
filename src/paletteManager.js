@@ -1,100 +1,127 @@
 var PaletteManager = (function() {
 
+    /**
+     * Manages the palettes.
+     * @class PaletteManager
+     * @constructor
+     */
     function PaletteManager() {
-        var _colorLUT = {};
-        var _paletteLookUpPatterns = [{
-            // Left
-            topSide: 'darkSide',
-            leftSide: 'normalSide',
-            rightSide: 'darkestSide'
-        }, {
-            // Right
-            topSide: 'darkSide',
-            leftSide: 'darkestSide',
-            rightSide: 'normalSide'
-        }, {
-            // Top Right
-            topSide: 'normalSide',
-            leftSide: 'darkestSide',
-            rightSide: 'darkSide'
-        }, {
-            // Top Left
-            topSide: 'normalSide',
-            leftSide: 'darkSide',
-            rightSide: 'darkestSide'
-        }];
-
-        var _paletteLookUpPattern = _paletteLookUpPatterns[Pix.SUN_TOP_LEFT];
-
-        // Private
-        function _getPalette(color) {
-            var palette = null;
-
-            if (!_colorLUT[color]) {
-                if (color.a !== 0) {
-                    var hslColor = color.getHSL();
-                    palette = {
-                        'normalSide': color,
-                        'darkSide': hslColor.darken(30).getRGB(),
-                        'darkestSide': hslColor.darken(60).getRGB(),
-                        'highlight': hslColor.lighten(30).getRGB(),
-                        'cornerHighlight': hslColor.lighten(80).getRGB(),
-                        'outline': hslColor.darken(90).getRGB()
-                    };
-                }
-                _colorLUT[color] = palette;
-            }
-            return _colorLUT[color];
-        }
-
-        // Public
-        this.isColorValid = function(color) {
-            var palette = _getPalette(color);
-            if (palette === null) {
-                return false;
-            }
-            return true;
-        };
-
-        this.getPattern = function() {
-            return _paletteLookUpPattern;
-        };
-
-        this.getTopColor = function(color) {
-            return _getPalette(color)[_paletteLookUpPattern.topSide];
-        };
-
-        this.getLeftColor = function(color) {
-            return _getPalette(color)[_paletteLookUpPattern.leftSide];
-        };
-
-        this.getRightColor = function(color) {
-            return _getPalette(color)[_paletteLookUpPattern.rightSide];
-        };
-
-        this.getOutlineColor = function(color) {
-            return _getPalette(color).outline;
-        };
-
-        this.getHightLightColor = function(color) {
-            return _getPalette(color).highlight;
-        };
-
-        this.getCornerHightlightColor = function(color) {
-            return _getPalette(color).cornerHighlight;
-        };
-
-        this.getPalette = function(color) {
-            return _getPalette(color);
-        };
-
-        this.setSunPosition = function(position) {
-            if (_paletteLookUpPatterns[position]) {
-                _paletteLookUpPattern = _paletteLookUpPatterns[position];
-            }
-        };
-
+        this._paletteLUT = {};
+        this._paletteLookUpPattern = Pix.paletteLookUpPatterns[Pix.SUN_TOP_LEFT];
     }
+
+    /**
+     * Check if a color is valid by looking at the alpha channel.
+     * @method isColorValid
+     * @param {ColorRGB} color The RGB color that should be evaluated.
+     * @return {Boolean} If color is valid or not.
+     */
+    PaletteManager.prototype.isColorValid = function(color) {
+        var palette = this.getPalette(color);
+        if (palette === null) {
+            return false;
+        }
+        return true;
+    };
+
+    /**
+     * Get the palette look up pattern
+     * @method getPattern
+     * @return {Object} The pattern.
+     */
+    PaletteManager.prototype.getPattern = function() {
+        return this._paletteLookUpPattern;
+    };
+
+    /**
+     * Get the top side version of the input color.
+     * @method getTopColor
+     * @param {ColorRGB} color The input color.
+     * @return {ColorRGB} The RGB color of the top side.
+     */
+    PaletteManager.prototype.getTopColor = function(color) {
+        return this.getPalette(color)[this._paletteLookUpPattern.topSide];
+    };
+
+    /**
+     * Get the left side version of the input color.
+     * @method getLeftColor
+     * @param {ColorRGB} color The input color.
+     * @return {ColorRGB} The RGB color of the left side.
+     */
+    PaletteManager.prototype.getLeftColor = function(color) {
+        return this.getPalette(color)[this._paletteLookUpPattern.leftSide];
+    };
+
+    /**
+     * Get the right side version of the input color.
+     * @method getRightColor
+     * @param {ColorRGB} color The input color.
+     * @return {ColorRGB} The RGB color of the right side.
+     */
+    PaletteManager.prototype.getRightColor = function(color) {
+        return this.getPalette(color)[this._paletteLookUpPattern.rightSide];
+    };
+
+    /**
+     * Get the outline version of the input color.
+     * @method getOutlineColor
+     * @param {ColorRGB} color The input color.
+     * @return {ColorRGB} The RGB color of the outline.
+     */
+    PaletteManager.prototype.getOutlineColor = function(color) {
+        return this.getPalette(color).outline;
+    };
+
+    /**
+     * Get the highlight version of the input color.
+     * @method getHightLightColor
+     * @param {ColorRGB} color The input color.
+     * @return {ColorRGB} The RGB color of the highlight.
+     */
+    PaletteManager.prototype.getHightLightColor = function(color) {
+        return this.getPalette(color).highlight;
+    };
+
+    /**
+     * Get the corner highlight version of the input color.
+     * @method getCornerHightlightColor
+     * @param {ColorRGB} color The input color.
+     * @return {ColorRGB} The RGB color of the corner highlight.
+     */
+    PaletteManager.prototype.getCornerHightlightColor = function(color) {
+        return this.getPalette(color).cornerHighlight;
+    };
+
+
+
+    /**
+     * Get the palette of the input color.
+     * @method getPalette
+     * @param {ColorRGB} color The input color.
+     * @return {Palette|null} The palette generated from the input color or null if no palette can be generated.
+     */
+    PaletteManager.prototype.getPalette = function(color) {
+        var palette = null;
+        if (!this._paletteLUT[color]) {
+            if (color.a !== 0) {
+                palette = new Palette(color);
+            }
+            this._paletteLUT[color] = palette;
+        }
+        return this._paletteLUT[color];
+    };
+
+    /**
+     * Set the sun position to change the palette look up pattern.
+     * @method setSunPosition
+     * @param {Number} position The sun position.
+     */
+    PaletteManager.prototype.setSunPosition = function(position) {
+        if (Pix.paletteLookUpPatterns[position]) {
+            this._paletteLookUpPattern = Pix.paletteLookUpPatterns[position];
+        }
+    };
 
     return PaletteManager;
 

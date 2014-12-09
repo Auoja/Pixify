@@ -1,5 +1,16 @@
 var ColorHSL = (function() {
 
+    /**
+     * An HSL color object.
+     *
+     * @class ColorHSL
+     * @constructor
+     *
+     * @param {Number} h Hue
+     * @param {Number} s Saturation
+     * @param {Number} l Light
+     * @param {Number} a Alpha
+     */
     function ColorHSL(h, s, l, a) {
         this.h = h;
         this.s = s;
@@ -7,14 +18,34 @@ var ColorHSL = (function() {
         this.a = a;
     }
 
+    /**
+     * Darken the color
+     *
+     * @method darken
+     * @param {Number} amount The percentage the color should be darkened.
+     * @return {ColorHSL} A darker version of the `ColorHSL`
+     */
     ColorHSL.prototype.darken = function(amount) {
         return new ColorHSL(this.h, this.s, this.l * (1 - (amount) / 100), 1);
     };
 
+    /**
+     * Lighten the color
+     *
+     * @method lighten
+     * @param {Number} amount The percentage the color should be lightened.
+     * @return {ColorHSL} A lighter version of the `ColorHSL`
+     */
     ColorHSL.prototype.lighten = function(amount) {
         return new ColorHSL(this.h, this.s, this.l * (1 + (amount) / 100), 1);
     };
 
+    /**
+     * Create a `ColorRGB` version of the `ColorHSL`.
+     *
+     * @method getRGB
+     * @return {ColorRGB} The RGB color representation.
+     */
     ColorHSL.prototype.getRGB = function() {
         var r;
         var g;
@@ -40,7 +71,7 @@ var ColorHSL = (function() {
         }
 
         if (this.s === 0) {
-            r = g = b = this.l; // achromatic
+            r = g = b = this.l;
         } else {
             var q = this.l < 0.5 ? this.l * (1 + this.s) : this.l + this.s - this.l * this.s;
             var p = 2 * this.l - q;
