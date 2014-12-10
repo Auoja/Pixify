@@ -1,7 +1,7 @@
 var gulp = require('gulp');
 var concat = require('gulp-concat');
 var jshint = require('gulp-jshint');
-var yuidoc = require("gulp-yuidoc");
+var jsdoc = require('gulp-jsdoc');
 
 var browserSync = require('browser-sync')
 
@@ -26,8 +26,7 @@ gulp.task('build', function() {
 
 gulp.task('doc', function() {
     gulp.src(scriptPaths)
-        .pipe(yuidoc())
-        .pipe(gulp.dest("./doc"));
+        .pipe(jsdoc('./documentation'))
 });
 
 gulp.task('default', ['build', 'browser-sync'], function() {

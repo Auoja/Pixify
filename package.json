@@ -2,7 +2,7 @@
   "name": "pixify",
   "version": "1.0.0",
   "description": "A tool for making pixel art from pixel art",
-  "main": "build/pixify.js",
+  "main": "pixify.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -20,8 +20,7 @@
     "browser-sync": "~1.7.1",
     "gulp": "~3.8.10",
     "gulp-concat": "~2.4.2",
-    "gulp-jshint": "~1.9.0",
-    "gulp-yuidoc": "^0.1.2",
-    "yuidocjs": "^0.4.0"
+    "gulp-jsdoc": "^0.1.4",
+    "gulp-jshint": "~1.9.0"
   }
 }

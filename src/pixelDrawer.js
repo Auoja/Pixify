@@ -3,9 +3,8 @@ var PixelDrawer = (function() {
     /**
      * Responsible for rendering the generated isometric pixel art.
      *
+     * @public
      * @class PixelDrawer
-     * @constructor
-     *
      * @param {Context} context The 2d context of the canvas the rendering should be done in.
      * @param {Number} width The width of the canvas.
      * @param {Number} height The height of the canvas.
@@ -19,6 +18,8 @@ var PixelDrawer = (function() {
 
     /**
      * Flush all color data.
+     *
+     * @memberOf PixelDrawer
      * @method flush
      */
     PixelDrawer.prototype.flush = function() {
@@ -27,7 +28,7 @@ var PixelDrawer = (function() {
 
     /**
      * Set the color value of the specified pixel.
-     *
+     *@memberOf PixelDrawer
      * @method setPixel
      * @param {Number} x The x coordinate.
      * @param {Number} y The y coordinate.
@@ -45,6 +46,7 @@ var PixelDrawer = (function() {
 
     /**
      * Render image to canvas.
+     * @memberOf PixelDrawer
      * @method render
      */
     PixelDrawer.prototype.render = function() {

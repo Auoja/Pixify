@@ -3,9 +3,8 @@ var ColorRGB = (function() {
     /**
      * An RGB color object.
      *
+     * @public
      * @class ColorRGB
-     * @constructor
-     *
      * @param {Number} r Red
      * @param {Number} g Green
      * @param {Number} b Blue
@@ -22,6 +21,7 @@ var ColorRGB = (function() {
      * Create a `ColorHSL` version of the `ColorRGB`
      *
      * @method getHSL
+     * @memberOf ColorRGB
      * @return {ColorHSL} The HSL color representation.
      */
     ColorRGB.prototype.getHSL = function() {
@@ -56,7 +56,9 @@ var ColorRGB = (function() {
 
     /**
      * Get string representation of `ColorRGB`.
+     *
      * @method toString
+     * @memberOf ColorRGB
      * @return {String} The string representation.
      */
     ColorRGB.prototype.toString = function() {

@@ -3,9 +3,8 @@ var Sprite = (function() {
     /**
      * The sprite used to create the isometric version.
      *
+     * @public
      * @class Sprite
-     * @constructor
-     *
      * @param {Image} image The sprite image.
      */
     function Sprite(image) {
@@ -21,6 +20,8 @@ var Sprite = (function() {
 
     /**
      * Get the width of the sprite.
+     *
+     * @memberOf Sprite
      * @method getWidth
      * @return {Number} The width of the sprite.
      */
@@ -30,6 +31,7 @@ var Sprite = (function() {
 
     /**
      * Get the height of the sprite.
+     * @memberOf Sprite
      * @method getHeight
      * @return {Number} The height of the sprite.
      */
@@ -39,6 +41,7 @@ var Sprite = (function() {
 
     /**
      * Get the RGB color value of the specified pixel.
+     * @memberOf Sprite
      * @method getColor
      * @param {Number} x The x coordinate.
      * @param {Number} y The y coordinate.

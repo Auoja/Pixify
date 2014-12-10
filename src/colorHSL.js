@@ -3,9 +3,8 @@ var ColorHSL = (function() {
     /**
      * An HSL color object.
      *
+     * @public
      * @class ColorHSL
-     * @constructor
-     *
      * @param {Number} h Hue
      * @param {Number} s Saturation
      * @param {Number} l Light
@@ -22,6 +21,7 @@ var ColorHSL = (function() {
      * Darken the color
      *
      * @method darken
+     * @memberOf ColorHSL
      * @param {Number} amount The percentage the color should be darkened.
      * @return {ColorHSL} A darker version of the `ColorHSL`
      */
@@ -33,6 +33,7 @@ var ColorHSL = (function() {
      * Lighten the color
      *
      * @method lighten
+     * @memberOf ColorHSL
      * @param {Number} amount The percentage the color should be lightened.
      * @return {ColorHSL} A lighter version of the `ColorHSL`
      */
@@ -44,6 +45,7 @@ var ColorHSL = (function() {
      * Create a `ColorRGB` version of the `ColorHSL`.
      *
      * @method getRGB
+     * @memberOf ColorHSL
      * @return {ColorRGB} The RGB color representation.
      */
     ColorHSL.prototype.getRGB = function() {

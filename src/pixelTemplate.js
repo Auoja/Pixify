@@ -3,9 +3,8 @@ var PixelTemplate = (function() {
     /**
      * The isometric pixel template.
      *
+     * @public
      * @class  PixelTemplate
-     * @constructor
-     *
      * @param {Number} width The width of the template
      * @param {Number} height The height of the template
      */
@@ -28,6 +27,8 @@ var PixelTemplate = (function() {
 
     /**
      * Get the template data array.
+     *
+     * @memberOf PixelTemplate
      * @method getTemplate
      * @return {Array} The template data
      */
@@ -37,6 +38,8 @@ var PixelTemplate = (function() {
 
     /**
      * Get the width of the template.
+     *
+     * @memberOf PixelTemplate
      * @method getWidth
      * @return {Number} The width of the template.
      */
@@ -46,6 +49,8 @@ var PixelTemplate = (function() {
 
     /**
      * Get the height of the template.
+     *
+     * @memberOf PixelTemplate
      * @method getHeight
      * @return {Number} The height of the template.
      */
@@ -55,6 +60,8 @@ var PixelTemplate = (function() {
 
     /**
      * Flush the template.
+     *
+     * @memberOf PixelTemplate
      * @method flush
      */
     PixelTemplate.prototype.flush = function() {
@@ -66,6 +73,8 @@ var PixelTemplate = (function() {
 
     /**
      * Set the cordinate the draw commands will start at.
+     *
+     * @memberOf PixelTemplate
      * @method moveTo
      * @param {Number} x The x coordinate.
      * @param {Number} y The y coordinate.
@@ -77,6 +86,8 @@ var PixelTemplate = (function() {
 
     /**
      * Move the coordinate the draw commands will start at without drawing anything to the template.
+     *
+     * @memberOf PixelTemplate
      * @method moveRelativeTo
      * @param {Number} x The x coordinate move distance.
      * @param {Number} y The y coordinate move distance.
@@ -88,6 +99,8 @@ var PixelTemplate = (function() {
 
     /**
      * Set the value the draw commands should set pixels to.
+     *
+     * @memberOf PixelTemplate
      * @method setValue
      * @param {Number} value The value to set.
      */
@@ -97,6 +110,8 @@ var PixelTemplate = (function() {
 
     /**
      * Set a single pixel value of the template.
+     *
+     * @memberOf PixelTemplate
      * @method setPixel
      * @param {Number} x The x coordinate.
      * @param {Number} y The y coordinate.
@@ -108,6 +123,8 @@ var PixelTemplate = (function() {
 
     /**
      * Draw a upwards slanted line on the template.
+     *
+     * @memberOf PixelTemplate
      * @method drawSlantedLineUp
      * @param {Number} distance The distance to draw.
      */
@@ -123,6 +140,8 @@ var PixelTemplate = (function() {
 
     /**
      * Draw a downwards slanted line on the template.
+     *
+     * @memberOf PixelTemplate
      * @method drawSlantedLineDown
      * @param {Number} distance The distance to draw.
      */
@@ -138,6 +157,8 @@ var PixelTemplate = (function() {
 
     /**
      * Draw a vertical line on the template.
+     *
+     * @memberOf PixelTemplate
      * @method drawVerticalLine
      * @param {Number} distance The distance to draw.
      */
@@ -151,6 +172,8 @@ var PixelTemplate = (function() {
 
     /**
      * Draw a horizontal line on the template.
+     *
+     * @memberOf PixelTemplate
      * @method drawHorizontalLine
      * @param {Number} distance The distance to draw.
      */
@@ -164,6 +187,8 @@ var PixelTemplate = (function() {
 
     /**
      * Set the palette look up pattern of the template, used in `getColorizedTemplate()` for shading.
+     *
+     * @memberOf PixelTemplate
      * @method setPaletteLookUpPattern
      * @param {Object} pattern The pattern object
      */
@@ -173,6 +198,8 @@ var PixelTemplate = (function() {
 
     /**
      * Get a colorized version of the template.
+     *
+     * @memberOf PixelTemplate
      * @method getColorizedTemplate
      * @param {Palette} palette The palette to color the template with.
      * @return {Array} A colorized version of the template.

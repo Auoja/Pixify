@@ -1,12 +1,13 @@
 window.Pixify = (function() {
 
     /**
-     * An RGB color object.
-     *
+     * @public
      * @class Pixify
-     * @constructor
-     *
      * @param {Object} opts The options to initialize with.
+     * @param {Canvas} opts.canvas The canvas to render pixel art to.
+     * @param {Number} opts.pixelSide The side of the isometric pixel cube.
+     * @param {Number} opts.pixelGap The gap between pixel cubes.
+     * @param {Image} opts.image The source sprite.
      */
     function Pixify(opts) {
         this._canvas = opts.canvas;
@@ -33,6 +34,8 @@ window.Pixify = (function() {
 
     /**
      * Set the sun position to change the palette look up pattern.
+     *
+     * @memberOf Pixify
      * @method setSunPosition
      * @param {Number} position The sun position.
      */
@@ -42,6 +45,8 @@ window.Pixify = (function() {
 
     /**
      * Render the pixel art horizontally.
+     *
+     * @memberOf Pixify
      * @method renderHorizontal
      */
     Pixify.prototype.renderHorizontal = function() {
@@ -72,6 +77,8 @@ window.Pixify = (function() {
 
     /**
      * Render the pixel art vertically.
+     *
+     * @memberOf Pixify
      * @method renderVertical
      */
     Pixify.prototype.renderVertical = function() {
@@ -102,6 +109,8 @@ window.Pixify = (function() {
 
     /**
      * Set the isometric pixel cube dimensions.
+     *
+     * @memberOf Pixify
      * @method setPixelSize
      * @param {Number} side The side of the isometric pixel cube.
      */
@@ -115,6 +124,8 @@ window.Pixify = (function() {
 
     /**
      * Set the gap between the cubes.
+     *
+     * @memberOf Pixify
      * @method setPixelGap
      * @param {Number} gap The gap between the pixel cubes.
      */
@@ -125,6 +136,8 @@ window.Pixify = (function() {
 
     /*!
      * Create the pixel cube template.
+     *
+     * @memberOf Pixify
      * @method _createTemplate
      */
     Pixify.prototype._createTemplate = function() {
@@ -190,6 +203,8 @@ window.Pixify = (function() {
 
     /*!
      * Colorize the template based on the input pixel art.
+     *
+     * @memberOf Pixify
      * @method _template2pixel
      * @param {Number} originX The x coordinate of the pixel cube origin.
      * @param {Number} originY The y coordinate of the pixel cube origin.

@@ -2,8 +2,9 @@ var PaletteManager = (function() {
 
     /**
      * Manages the palettes.
+     *
+     * @public
      * @class PaletteManager
-     * @constructor
      */
     function PaletteManager() {
         this._paletteLUT = {};
@@ -12,7 +13,9 @@ var PaletteManager = (function() {
 
     /**
      * Check if a color is valid by looking at the alpha channel.
+     *
      * @method isColorValid
+     * @memberOf PaletteManager
      * @param {ColorRGB} color The RGB color that should be evaluated.
      * @return {Boolean} If color is valid or not.
      */
@@ -26,7 +29,9 @@ var PaletteManager = (function() {
 
     /**
      * Get the palette look up pattern
+     *
      * @method getPattern
+     * @memberOf PaletteManager
      * @return {Object} The pattern.
      */
     PaletteManager.prototype.getPattern = function() {
@@ -35,7 +40,9 @@ var PaletteManager = (function() {
 
     /**
      * Get the top side version of the input color.
+     *
      * @method getTopColor
+     * @memberOf PaletteManager
      * @param {ColorRGB} color The input color.
      * @return {ColorRGB} The RGB color of the top side.
      */
@@ -45,7 +52,9 @@ var PaletteManager = (function() {
 
     /**
      * Get the left side version of the input color.
+     *
      * @method getLeftColor
+     * @memberOf PaletteManager
      * @param {ColorRGB} color The input color.
      * @return {ColorRGB} The RGB color of the left side.
      */
@@ -55,7 +64,9 @@ var PaletteManager = (function() {
 
     /**
      * Get the right side version of the input color.
+     *
      * @method getRightColor
+     * @memberOf PaletteManager
      * @param {ColorRGB} color The input color.
      * @return {ColorRGB} The RGB color of the right side.
      */
@@ -65,7 +76,9 @@ var PaletteManager = (function() {
 
     /**
      * Get the outline version of the input color.
+     *
      * @method getOutlineColor
+     * @memberOf PaletteManager
      * @param {ColorRGB} color The input color.
      * @return {ColorRGB} The RGB color of the outline.
      */
@@ -75,7 +88,9 @@ var PaletteManager = (function() {
 
     /**
      * Get the highlight version of the input color.
+     *
      * @method getHightLightColor
+     * @memberOf PaletteManager
      * @param {ColorRGB} color The input color.
      * @return {ColorRGB} The RGB color of the highlight.
      */
@@ -85,7 +100,9 @@ var PaletteManager = (function() {
 
     /**
      * Get the corner highlight version of the input color.
+     *
      * @method getCornerHightlightColor
+     * @memberOf PaletteManager
      * @param {ColorRGB} color The input color.
      * @return {ColorRGB} The RGB color of the corner highlight.
      */
@@ -97,7 +114,9 @@ var PaletteManager = (function() {
 
     /**
      * Get the palette of the input color.
+     *
      * @method getPalette
+     * @memberOf PaletteManager
      * @param {ColorRGB} color The input color.
      * @return {Palette|null} The palette generated from the input color or null if no palette can be generated.
      */
@@ -114,7 +133,9 @@ var PaletteManager = (function() {
 
     /**
      * Set the sun position to change the palette look up pattern.
+     *
      * @method setSunPosition
+     * @memberOf PaletteManager
      * @param {Number} position The sun position.
      */
     PaletteManager.prototype.setSunPosition = function(position) {
